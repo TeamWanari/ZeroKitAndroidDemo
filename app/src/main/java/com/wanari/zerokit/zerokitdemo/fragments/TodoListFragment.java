@@ -5,7 +5,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import com.wanari.zerokit.zerokitdemo.R;
+import com.wanari.zerokit.zerokitdemo.adapters.TodoRecyclerViewAdapter;
 import com.wanari.zerokit.zerokitdemo.database.FireBaseHelper;
+import com.wanari.zerokit.zerokitdemo.entities.Table;
 import com.wanari.zerokit.zerokitdemo.entities.Todo;
 import com.wanari.zerokit.zerokitdemo.interfaces.IMain;
 
@@ -27,18 +29,23 @@ import static com.wanari.zerokit.zerokitdemo.R.id.todoList;
 
 public class TodoListFragment extends Fragment {
 
+    private static final String ARG_TABLE = "Table";
+
     private RecyclerView mList;
 
     private IMain mainListener;
 
     private TodoRecyclerViewAdapter mTodoRecyclerViewAdapter;
 
+    private Table selectedTable;
+
     public TodoListFragment() {
     }
 
-    public static TodoListFragment newInstance() {
+    public static TodoListFragment newInstance(Table table) {
         TodoListFragment fragment = new TodoListFragment();
         Bundle args = new Bundle();
+        args.putParcelable(ARG_TABLE, table);
         fragment.setArguments(args);
         return fragment;
     }
@@ -46,6 +53,9 @@ public class TodoListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            selectedTable = getArguments().getParcelable(ARG_TABLE);
+        }
 
     }
 
@@ -54,18 +64,20 @@ public class TodoListFragment extends Fragment {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_todo_list, container, false);
         mList = (RecyclerView) view.findViewById(todoList);
-        getData();
+        if (mTodoRecyclerViewAdapter == null) {
+            getData();
+        }
         return view;
     }
 
     private void getData() {
-        FireBaseHelper.getInstance().getTodos(new ValueEventListener() {
+        FireBaseHelper.getInstance().getTodos(selectedTable.getId(), new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Todo> todoList = new ArrayList<>();
                 for (DataSnapshot todoSnapshot : dataSnapshot.getChildren()) {
                     Map<String, String> map = (HashMap<String, String>) todoSnapshot.getValue();
-                    Todo todoItem = new Todo(map);
+                    Todo todoItem = new Todo(todoSnapshot.getKey(), map);
                     todoList.add(todoItem);
                 }
                 if (mTodoRecyclerViewAdapter == null) {

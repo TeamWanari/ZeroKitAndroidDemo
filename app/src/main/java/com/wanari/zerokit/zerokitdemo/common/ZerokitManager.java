@@ -1,7 +1,8 @@
-package com.wanari.zerokit.zerokitdemo;
+package com.wanari.zerokit.zerokitdemo.common;
 
 import com.tresorit.adminapi.AdminApi;
 import com.tresorit.zerokit.Zerokit;
+import com.wanari.zerokit.zerokitdemo.ZerokitApplication;
 
 import android.content.pm.PackageManager;
 

@@ -13,4 +13,5 @@
     <string name="sign_in_btn">Sign in</string>
     <string name="password_confirm_hint">Password confirm</string>
     <string name="alert_not_identical">Given passwords do not match</string>
+    <string name="alert_no_user">\"No user id found for this user alias\"</string>
 </resources>

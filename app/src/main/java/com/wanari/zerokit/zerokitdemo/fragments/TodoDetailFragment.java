@@ -23,6 +23,8 @@ public class TodoDetailFragment extends Fragment {
 
     private static final String ARG_TODO = "todo";
 
+    private static final String ARG_TABLE_NAME = "TableName";
+
     private TextInputEditText mTodoDetailTitle;
 
     private TextInputLayout mTodoDetailTitleContainer;
@@ -37,13 +39,16 @@ public class TodoDetailFragment extends Fragment {
 
     private Todo selectedTodo;
 
+    private String selectedTableName;
+
     public TodoDetailFragment() {
     }
 
-    public static TodoDetailFragment newInstance(Todo todo) {
+    public static TodoDetailFragment newInstance(Todo todo, String tableName) {
         TodoDetailFragment fragment = new TodoDetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_TODO, todo);
+        args.putString(ARG_TABLE_NAME, tableName);
         fragment.setArguments(args);
         return fragment;
     }
@@ -53,6 +58,7 @@ public class TodoDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             selectedTodo = getArguments().getParcelable(ARG_TODO);
+            selectedTableName = getArguments().getString(ARG_TABLE_NAME);
         }
     }
 
@@ -77,19 +83,19 @@ public class TodoDetailFragment extends Fragment {
             public void onClick(View view) {
                 closeKeyboard();
                 if (ValidationUtils.hasText(mTodoDetailTitleContainer) && ValidationUtils.hasText(mTodoDetailDescriptionContainer)) {
-                    if(selectedTodo == null){
+                    if (selectedTodo == null) {
                         selectedTodo = new Todo(mTodoDetailTitle.getText().toString(), mTodoDetailDescription.getText().toString());
                     } else {
                         selectedTodo.setTitle(mTodoDetailTitle.getText().toString());
                         selectedTodo.setDescription(mTodoDetailDescription.getText().toString());
                     }
                     FireBaseHelper.getInstance()
-                            .saveTodo(selectedTodo,
+                            .saveTodo(selectedTodo, selectedTableName,
                                     new OnSuccessListener() {
                                         @Override
                                         public void onSuccess(Object o) {
                                             if (mainListener != null) {
-                                                mainListener.saveFinished();
+                                                mainListener.saveSuccess();
                                             }
                                         }
                                     });

@@ -1,4 +1,4 @@
-package com.wanari.zerokit.zerokitdemo.fragments;
+package com.wanari.zerokit.zerokitdemo.adapters;
 
 import com.wanari.zerokit.zerokitdemo.R;
 import com.wanari.zerokit.zerokitdemo.entities.Todo;
@@ -68,9 +68,8 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
     }
 
     public void setItems(List<Todo> todoList) {
-        int oldNum = mValues.size();
         mValues = todoList;
-        notifyItemRangeChanged(0, oldNum);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

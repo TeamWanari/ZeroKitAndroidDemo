@@ -1,6 +1,7 @@
-package com.wanari.zerokit.zerokitdemo;
+package com.wanari.zerokit.zerokitdemo.activities;
 
 import com.tresorit.zerokit.observer.Action1;
+import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;

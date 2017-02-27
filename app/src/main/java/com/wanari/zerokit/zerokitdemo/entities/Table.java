@@ -9,58 +9,37 @@ import android.os.Parcelable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.R.attr.author;
+import static android.R.attr.description;
 
 @IgnoreExtraProperties
-public class Todo implements Parcelable {
+public class Table implements Parcelable {
 
     @Exclude
     private String id;
 
     private String title;
 
-    private String description;
-
-    public Todo(String title, String description) {
+    public Table(String title) {
         this.title = title;
-        this.description = description;
     }
 
-    public Todo(String key, Map<String, String> dataSnapshot) {
+    public Table(String key, Map<String, String> dataSnapshot) {
         this.id = key;
         this.title = dataSnapshot.get("title");
-        this.description = dataSnapshot.get("description");
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getTitle() {
         return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("title", title);
-        result.put("description", description);
         return result;
     }
 
@@ -73,24 +52,47 @@ public class Todo implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.id);
         dest.writeString(this.title);
-        dest.writeString(this.description);
     }
 
-    protected Todo(Parcel in) {
+    protected Table(Parcel in) {
         this.id = in.readString();
         this.title = in.readString();
-        this.description = in.readString();
     }
 
-    public static final Parcelable.Creator<Todo> CREATOR = new Parcelable.Creator<Todo>() {
+    public static final Parcelable.Creator<Table> CREATOR = new Parcelable.Creator<Table>() {
         @Override
-        public Todo createFromParcel(Parcel source) {
-            return new Todo(source);
+        public Table createFromParcel(Parcel source) {
+            return new Table(source);
         }
 
         @Override
-        public Todo[] newArray(int size) {
-            return new Todo[size];
+        public Table[] newArray(int size) {
+            return new Table[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Table table = (Table) o;
+
+        if (!id.equals(table.id)) {
+            return false;
+        }
+        return title.equals(table.title);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + title.hashCode();
+        return result;
+    }
 }

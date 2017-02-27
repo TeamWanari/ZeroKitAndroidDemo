@@ -5,11 +5,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.wanari.zerokit.zerokitdemo.entities.Table;
 import com.wanari.zerokit.zerokitdemo.entities.Todo;
 
 public final class FireBaseHelper {
 
     private static FireBaseHelper instance;
+
+    private static final String DATABASE_TODO_LISTS = "tableslist";
 
     private static final String DATABASE_TODOS = "todos";
 
@@ -28,25 +31,34 @@ public final class FireBaseHelper {
         return instance;
     }
 
-    public void getTodos(ValueEventListener valueEventListener) {
-        databaseRef.child(DATABASE_TODOS).addValueEventListener(valueEventListener);
+    public void getTableLists(ValueEventListener valueEventListener){
+        databaseRef.child(DATABASE_TODO_LISTS).addListenerForSingleValueEvent(valueEventListener);
     }
 
-    public void saveTodo(Todo todo, OnSuccessListener onSuccessListener) {
+    public void getTodos(String tableId, ValueEventListener valueEventListener) {
+        databaseRef.child(DATABASE_TODO_LISTS).child(tableId).child(DATABASE_TODOS).addValueEventListener(valueEventListener);
+    }
+
+    public void saveTodo(Todo todo, String tableName, OnSuccessListener onSuccessListener) {
         String key = todo.getId();
         if (key == null) {
             key = databaseRef.push().getKey();
             todo.setId(key);
-            databaseRef.child(DATABASE_TODOS).child(key).setValue(todo).addOnSuccessListener(onSuccessListener);
+            databaseRef.child(DATABASE_TODO_LISTS).child(tableName).child(DATABASE_TODOS).child(key).setValue(todo).addOnSuccessListener(onSuccessListener);
         } else {
-            databaseRef.child(DATABASE_TODOS).child(key).updateChildren(todo.toMap()).addOnSuccessListener(onSuccessListener);
+            databaseRef.child(DATABASE_TODO_LISTS).child(tableName).child(DATABASE_TODOS).child(key).updateChildren(todo.toMap()).addOnSuccessListener(onSuccessListener);
         }
     }
 
-    public void deleteTodo(Todo todo, DatabaseReference.CompletionListener completionListener) {
+    public void deleteTodo(Todo todo, String tableName, DatabaseReference.CompletionListener completionListener) {
         String key = todo.getId();
         if (key != null) {
-            databaseRef.child(DATABASE_TODOS).child(key).removeValue(completionListener);
+            databaseRef.child(DATABASE_TODO_LISTS).child(tableName).child(DATABASE_TODOS).child(key).removeValue(completionListener);
         }
+    }
+
+    public void saveTable(Table table, OnSuccessListener onSuccessListener){
+        String key = databaseRef.push().getKey();
+        databaseRef.child(DATABASE_TODO_LISTS).child(key).setValue(table).addOnSuccessListener(onSuccessListener);
     }
 }

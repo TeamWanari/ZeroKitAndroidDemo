@@ -7,4 +7,8 @@ public interface ISignIn {
     void hideProgress();
 
     void showError(String message);
+
+    void navigateToSignIn();
+
+    void loginSuccess();
 }

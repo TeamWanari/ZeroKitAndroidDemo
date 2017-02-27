@@ -1,7 +1,14 @@
 package com.wanari.zerokit.zerokitdemo.fragments;
 
+import com.tresorit.adminapi.response.ResponseAdminApiError;
+import com.tresorit.adminapi.response.ResponseAdminApiInitUserRegistration;
 import com.tresorit.zerokit.PasswordEditText;
+import com.tresorit.zerokit.observer.Action1;
+import com.tresorit.zerokit.response.ResponseZerokitError;
+import com.tresorit.zerokit.response.ResponseZerokitRegister;
 import com.wanari.zerokit.zerokitdemo.R;
+import com.wanari.zerokit.zerokitdemo.common.AppConf;
+import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 import com.wanari.zerokit.zerokitdemo.interfaces.ISignIn;
 import com.wanari.zerokit.zerokitdemo.utils.ValidationUtils;
 
@@ -84,9 +91,48 @@ public class SignUpFragment extends Fragment implements TextWatcher, View.OnFocu
     private void validateInput() {
         if (ValidationUtils.hasText(usernameContainer) && ValidationUtils.hasText(passwordContainer, mPasswordExporter) && ValidationUtils
                 .hasText(passwordConfirmContainer, mPasswordConfirmExporter)) {
-            if(mPasswordExporter.isContentEqual(mPasswordConfirmExporter)) {
-                parentListener.showProgress();
-//            TODO signup
+            if (mPasswordExporter.isContentEqual(mPasswordConfirmExporter)) {
+                final String alias = usernameEditText.getText().toString();
+                showProgress();
+                Action1<ResponseAdminApiInitUserRegistration> responseAdminApiInitUserRegistrationAction
+                        = new Action1<ResponseAdminApiInitUserRegistration>() {
+                    @Override
+                    public void call(final ResponseAdminApiInitUserRegistration initUserRegistrationResponse) {
+                        Action1<ResponseZerokitRegister> responseZerokitRegisterAction = new Action1<ResponseZerokitRegister>() {
+                            @Override
+                            public void call(ResponseZerokitRegister responseZerokitRegister) {
+                                Action1<String> response = new Action1<String>() {
+                                    @Override
+                                    public void call(String s) {
+                                        AppConf.putUserId(alias, initUserRegistrationResponse.getUserId());
+                                        mPasswordExporter.clear();
+                                        mPasswordConfirmExporter.clear();
+                                        registrationSuccess();
+                                    }
+                                };
+                                ZerokitManager.getInstance().getAdminApi()
+                                        .validateUser(initUserRegistrationResponse.getUserId(), initUserRegistrationResponse.getRegSessionId(),
+                                                initUserRegistrationResponse.getRegSessionVerifier(),
+                                                responseZerokitRegister.getRegValidationVerifier(), alias)
+                                        .subscribe(response, new Action1<ResponseAdminApiError>() {
+                                            @Override
+                                            public void call(ResponseAdminApiError responseAdminApiError) {
+                                                showError(responseAdminApiError.getErrorMessage());
+                                            }
+                                        });
+                            }
+                        };
+                        ZerokitManager.getInstance().getZerokit()
+                                .register(initUserRegistrationResponse.getUserId(), initUserRegistrationResponse.getRegSessionId(), mPasswordExporter)
+                                .subscribe(responseZerokitRegisterAction, new Action1<ResponseZerokitError>() {
+                                    @Override
+                                    public void call(ResponseZerokitError responseZerokitError) {
+                                        showError(responseZerokitError.getMessage());
+                                    }
+                                });
+                    }
+                };
+                ZerokitManager.getInstance().getAdminApi().initUserRegistration().subscribe(responseAdminApiInitUserRegistrationAction);
             } else {
                 showError(getString(R.string.alert_not_identical));
             }
@@ -94,7 +140,27 @@ public class SignUpFragment extends Fragment implements TextWatcher, View.OnFocu
     }
 
     private void showError(String error) {
-        parentListener.showError(error);
+        if (parentListener != null) {
+            parentListener.showError(error);
+        }
+    }
+
+    private void registrationSuccess() {
+        if (parentListener != null) {
+            parentListener.navigateToSignIn();
+        }
+    }
+
+    private void showProgress() {
+        if (parentListener != null) {
+            parentListener.showProgress();
+        }
+    }
+
+    private void hideProgress() {
+        if (parentListener != null) {
+            parentListener.hideProgress();
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
-package com.wanari.zerokit.zerokitdemo;
+package com.wanari.zerokit.zerokitdemo.activities;
 
+import com.wanari.zerokit.zerokitdemo.R;
 import com.wanari.zerokit.zerokitdemo.interfaces.ISignIn;
 
 import android.content.Intent;
@@ -57,17 +58,40 @@ public class SignInActivity extends AppCompatActivity implements ISignIn {
 
     @Override
     public void showProgress() {
-        mProgressContainer.setVisibility(View.VISIBLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mProgressContainer.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     @Override
     public void hideProgress() {
-        mProgressContainer.setVisibility(View.GONE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mProgressContainer.setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override
     public void showError(String message) {
         hideProgress();
-        Snackbar.make(mParent, message, Snackbar.LENGTH_SHORT);
+        Snackbar.make(mParent, message, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void navigateToSignIn() {
+        hideProgress();
+        mViewFlipper.setDisplayedChild(0);
+    }
+
+    @Override
+    public void loginSuccess() {
+        hideProgress();
+        startActivity(new Intent(SignInActivity.this, MainActivity.class));
+        finish();
     }
 }

@@ -4,9 +4,11 @@ import com.wanari.zerokit.zerokitdemo.entities.Todo;
 
 public interface IMain {
 
-    void saveFinished();
+    void saveSuccess();
 
     void todoItemSelected(Todo item);
 
     void todoItemDelete(Todo item);
+
+    void closeTableList();
 }

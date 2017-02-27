@@ -1,7 +1,12 @@
 package com.wanari.zerokit.zerokitdemo.fragments;
 
 import com.tresorit.zerokit.PasswordEditText;
+import com.tresorit.zerokit.observer.Action1;
+import com.tresorit.zerokit.response.ResponseZerokitError;
+import com.tresorit.zerokit.response.ResponseZerokitLogin;
 import com.wanari.zerokit.zerokitdemo.R;
+import com.wanari.zerokit.zerokitdemo.common.AppConf;
+import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 import com.wanari.zerokit.zerokitdemo.interfaces.ISignIn;
 import com.wanari.zerokit.zerokitdemo.utils.ValidationUtils;
 
@@ -13,6 +18,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,13 +74,50 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
 
     private void validateInput() {
         if (ValidationUtils.hasText(usernameContainer) && ValidationUtils.hasText(passwordContainer, mPasswordExporter)) {
-            parentListener.showProgress();
-//            TODO signin
+            showProgress();
+            String alias = usernameEditText.getText().toString();
+            String userId = AppConf.getUserId(alias);
+            if (TextUtils.isEmpty(userId)) {
+                showError(getString(R.string.alert_no_user));
+            } else {
+                ZerokitManager.getInstance().getZerokit().login(userId, mPasswordExporter, true).subscribe(new Action1<ResponseZerokitLogin>() {
+                    @Override
+                    public void call(ResponseZerokitLogin responseLogin) {
+                        mPasswordExporter.clear();
+                        loginSuccess();
+                    }
+                }, new Action1<ResponseZerokitError>() {
+                    @Override
+                    public void call(ResponseZerokitError responseZerokitError) {
+                        showError(responseZerokitError.getMessage());
+                    }
+                });
+            }
+        }
+    }
+
+    private void loginSuccess() {
+        if (parentListener != null) {
+            parentListener.loginSuccess();
         }
     }
 
     private void showError(String error) {
-        parentListener.showError(error);
+        if (parentListener != null) {
+            parentListener.showError(error);
+        }
+    }
+
+    private void showProgress() {
+        if (parentListener != null) {
+            parentListener.showProgress();
+        }
+    }
+
+    private void hideProgress() {
+        if (parentListener != null) {
+            parentListener.hideProgress();
+        }
     }
 
     @Override
