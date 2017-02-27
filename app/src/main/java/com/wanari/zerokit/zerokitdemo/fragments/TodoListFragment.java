@@ -62,15 +62,6 @@ public class TodoListFragment extends Fragment {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_todo_list, container, false);
         mList = (RecyclerView) view.findViewById(R.id.todoList);
-        // Set the adapter
-        Context context = view.getContext();
-        if (mColumnCount <= 1) {
-            mList.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            mList.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-        }
-        mTodoRecyclerViewAdapter = new TodoRecyclerViewAdapter(mainListener);
-        mList.setAdapter(mTodoRecyclerViewAdapter);
         getData();
         return view;
     }
@@ -85,7 +76,9 @@ public class TodoListFragment extends Fragment {
                     Todo todoItem = new Todo(map);
                     todoList.add(todoItem);
                 }
-                if (mTodoRecyclerViewAdapter != null) {
+                if (mTodoRecyclerViewAdapter == null) {
+                    initAdapter(todoList);
+                } else {
                     mTodoRecyclerViewAdapter.setItems(todoList);
                 }
             }
@@ -95,6 +88,16 @@ public class TodoListFragment extends Fragment {
 
             }
         });
+    }
+
+    private void initAdapter(List<Todo> todoList) {
+        if (mColumnCount <= 1) {
+            mList.setLayoutManager(new LinearLayoutManager(getContext()));
+        } else {
+            mList.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
+        }
+        mTodoRecyclerViewAdapter = new TodoRecyclerViewAdapter(mainListener, todoList);
+        mList.setAdapter(mTodoRecyclerViewAdapter);
     }
 
     @Override
