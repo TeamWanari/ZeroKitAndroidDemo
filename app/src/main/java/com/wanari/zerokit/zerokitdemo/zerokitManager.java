@@ -12,11 +12,11 @@ import static com.tresorit.zerokit.Zerokit.API_ROOT;
 
 public class ZerokitManager {
 
-    private ZerokitManager instance;
+    private static ZerokitManager instance;
 
-    private Zerokit mZerokit;
+    private final Zerokit mZerokit;
 
-    private AdminApi mAdminApi;
+    private final AdminApi mAdminApi;
 
     private ZerokitManager() {
         try {
@@ -33,10 +33,18 @@ public class ZerokitManager {
         mZerokit = Zerokit.getInstance();
     }
 
-    public ZerokitManager getInstance() {
+    public static ZerokitManager getInstance() {
         if (instance == null) {
             instance = new ZerokitManager();
         }
         return instance;
+    }
+
+    public Zerokit getZerokit() {
+        return mZerokit;
+    }
+
+    public AdminApi getAdminApi() {
+        return mAdminApi;
     }
 }

@@ -8,12 +8,10 @@ import com.wanari.zerokit.zerokitdemo.R;
 import com.wanari.zerokit.zerokitdemo.database.FireBaseHelper;
 import com.wanari.zerokit.zerokitdemo.entities.Todo;
 import com.wanari.zerokit.zerokitdemo.interfaces.IMain;
-import com.wanari.zerokit.zerokitdemo.interfaces.OnListFragmentInteractionListener;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,13 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.wanari.zerokit.zerokitdemo.R.id.todoList;
+
 public class TodoListFragment extends Fragment {
 
-    private static final String ARG_COLUMN_COUNT = "column-count";
-
     private RecyclerView mList;
-
-    private int mColumnCount = 1;
 
     private IMain mainListener;
 
@@ -40,10 +36,9 @@ public class TodoListFragment extends Fragment {
     public TodoListFragment() {
     }
 
-    public static TodoListFragment newInstance(int columnCount) {
+    public static TodoListFragment newInstance() {
         TodoListFragment fragment = new TodoListFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,16 +47,13 @@ public class TodoListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_todo_list, container, false);
-        mList = (RecyclerView) view.findViewById(R.id.todoList);
+        mList = (RecyclerView) view.findViewById(todoList);
         getData();
         return view;
     }
@@ -91,11 +83,7 @@ public class TodoListFragment extends Fragment {
     }
 
     private void initAdapter(List<Todo> todoList) {
-        if (mColumnCount <= 1) {
-            mList.setLayoutManager(new LinearLayoutManager(getContext()));
-        } else {
-            mList.setLayoutManager(new GridLayoutManager(getContext(), mColumnCount));
-        }
+        mList.setLayoutManager(new LinearLayoutManager(getContext()));
         mTodoRecyclerViewAdapter = new TodoRecyclerViewAdapter(mainListener, todoList);
         mList.setAdapter(mTodoRecyclerViewAdapter);
     }

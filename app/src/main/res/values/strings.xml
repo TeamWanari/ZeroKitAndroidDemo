@@ -7,4 +7,10 @@
     <string name="todo_description_hint">Description</string>
     <string name="todo_save">Save</string>
     <string name="alert_empty">Empty field</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_up_btn">Sign Up</string>
+    <string name="sign_in_btn">Sign in</string>
+    <string name="password_confirm_hint">Password confirm</string>
+    <string name="alert_not_identical">Given passwords do not match</string>
 </resources>
