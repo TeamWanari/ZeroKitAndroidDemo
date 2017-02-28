@@ -32,7 +32,7 @@ public final class FireBaseHelper {
     }
 
     public void getTableLists(ValueEventListener valueEventListener){
-        databaseRef.child(DATABASE_TODO_LISTS).addListenerForSingleValueEvent(valueEventListener);
+        databaseRef.child(DATABASE_TODO_LISTS).addValueEventListener(valueEventListener);
     }
 
     public void getTodos(String tableId, ValueEventListener valueEventListener) {
@@ -57,8 +57,8 @@ public final class FireBaseHelper {
         }
     }
 
-    public void saveTable(Table table, OnSuccessListener onSuccessListener){
+    public void saveTable(Table table){
         String key = databaseRef.push().getKey();
-        databaseRef.child(DATABASE_TODO_LISTS).child(key).setValue(table).addOnSuccessListener(onSuccessListener);
+        databaseRef.child(DATABASE_TODO_LISTS).child(key).setValue(table);
     }
 }

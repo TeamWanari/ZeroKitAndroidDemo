@@ -13,10 +13,11 @@ import com.wanari.zerokit.zerokitdemo.interfaces.IMain;
 import com.wanari.zerokit.zerokitdemo.interfaces.ITableList;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,6 +25,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +36,8 @@ import java.util.Map;
 public class TableListFragment extends Fragment implements ITableList {
 
     private RecyclerView mTableList;
+
+    private Button mAddNewTableBtn;
 
     private TableRecyclerViewAdapter mTableRecyclerViewAdapter;
 
@@ -58,20 +63,49 @@ public class TableListFragment extends Fragment implements ITableList {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tablelist, container, false);
         mTableList = (RecyclerView) view.findViewById(R.id.tableList);
+        mAddNewTableBtn = (Button) view.findViewById(R.id.aaddNewTableBtn);
+        setListeners();
         getData();
         return view;
+    }
+
+    private void setListeners() {
+        mAddNewTableBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
+                final EditText newTableEdit = (EditText) getActivity().getLayoutInflater().inflate(R.layout.dialog_new_table, null);
+                alertBuilder.setView(newTableEdit);
+                alertBuilder.setTitle(getString(R.string.new_table));
+                alertBuilder.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (newTableEdit.getText() != null && newTableEdit.getText().length() > 0) {
+                            FireBaseHelper.getInstance().saveTable(new Table(newTableEdit.getText().toString()));
+                        }
+                    }
+                });
+                alertBuilder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                alertBuilder.create().show();
+            }
+        });
     }
 
     private void getData() {
         FireBaseHelper.getInstance().getTableLists(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Table> tableNames =  new ArrayList<>();
+                List<Table> tableNames = new ArrayList<>();
                 List<Table> alreadyAddedList = AppConf.getAddedTableNames();
-                for(DataSnapshot tableSnapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot tableSnapshot : dataSnapshot.getChildren()) {
                     Map<String, String> map = (HashMap<String, String>) tableSnapshot.getValue();
                     Table table = new Table(tableSnapshot.getKey(), map);
-                    if(!alreadyAddedList.contains(table)) {
+                    if (!alreadyAddedList.contains(table)) {
                         tableNames.add(table);
                     }
                 }
@@ -85,8 +119,8 @@ public class TableListFragment extends Fragment implements ITableList {
         });
     }
 
-    private void initLayout(List<Table> tableNames){
-        if(mTableRecyclerViewAdapter == null){
+    private void initLayout(List<Table> tableNames) {
+        if (mTableRecyclerViewAdapter == null) {
             mTableRecyclerViewAdapter = new TableRecyclerViewAdapter(this, tableNames);
             mTableList.setAdapter(mTableRecyclerViewAdapter);
         } else {
@@ -102,7 +136,7 @@ public class TableListFragment extends Fragment implements ITableList {
 
     @Override
     public void closeTableList() {
-        if(parentListener != null){
+        if (parentListener != null) {
             parentListener.closeTableList();
         }
     }
@@ -110,8 +144,8 @@ public class TableListFragment extends Fragment implements ITableList {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if(getActivity() instanceof IMain){
-            parentListener = (IMain)getActivity();
+        if (getActivity() instanceof IMain) {
+            parentListener = (IMain) getActivity();
         }
     }
 
@@ -124,7 +158,7 @@ public class TableListFragment extends Fragment implements ITableList {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         MenuItem menuItem = menu.findItem(R.id.search_table);
-        if(menuItem != null){
+        if (menuItem != null) {
             menuItem.setVisible(false);
         }
     }

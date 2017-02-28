@@ -56,7 +56,6 @@ public class TodoListFragment extends Fragment {
         if (getArguments() != null) {
             selectedTable = getArguments().getParcelable(ARG_TABLE);
         }
-
     }
 
     @Override
@@ -64,9 +63,7 @@ public class TodoListFragment extends Fragment {
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_todo_list, container, false);
         mList = (RecyclerView) view.findViewById(todoList);
-        if (mTodoRecyclerViewAdapter == null) {
-            getData();
-        }
+        getData();
         return view;
     }
 
@@ -80,7 +77,7 @@ public class TodoListFragment extends Fragment {
                     Todo todoItem = new Todo(todoSnapshot.getKey(), map);
                     todoList.add(todoItem);
                 }
-                if (mTodoRecyclerViewAdapter == null) {
+                if (mTodoRecyclerViewAdapter == null || mList.getAdapter() == null) {
                     initAdapter(todoList);
                 } else {
                     mTodoRecyclerViewAdapter.setItems(todoList);
@@ -96,6 +93,7 @@ public class TodoListFragment extends Fragment {
 
     private void initAdapter(List<Todo> todoList) {
         mList.setLayoutManager(new LinearLayoutManager(getContext()));
+        mList.setHasFixedSize(true);
         mTodoRecyclerViewAdapter = new TodoRecyclerViewAdapter(mainListener, todoList);
         mList.setAdapter(mTodoRecyclerViewAdapter);
     }

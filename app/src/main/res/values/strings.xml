@@ -14,4 +14,6 @@
     <string name="password_confirm_hint">Password confirm</string>
     <string name="alert_not_identical">Given passwords do not match</string>
     <string name="alert_no_user">\"No user id found for this user alias\"</string>
+    <string name="table_list_header">Add table to your list or add new one</string>
+    <string name="new_table">New table</string>
 </resources>

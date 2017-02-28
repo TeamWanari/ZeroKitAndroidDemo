@@ -61,9 +61,13 @@ public class MainActivity extends AppCompatActivity implements IMain {
     private void initLayout() {
         List<Table> addedTables = AppConf.getAddedTableNames();
         if (addedTables.size() > 0) {
-            mTodoListFragmentPagerAdapter = new TodoListFragmentPagerAdapter(getSupportFragmentManager(), addedTables);
-            mViewPager.setAdapter(mTodoListFragmentPagerAdapter);
-            mTabLayout.setupWithViewPager(mViewPager);
+            if(mTodoListFragmentPagerAdapter == null) {
+                mTodoListFragmentPagerAdapter = new TodoListFragmentPagerAdapter(getSupportFragmentManager(), addedTables);
+                mViewPager.setAdapter(mTodoListFragmentPagerAdapter);
+                mTabLayout.setupWithViewPager(mViewPager);
+            } else {
+                mTodoListFragmentPagerAdapter.setItems(addedTables);
+            }
         } else {
             openTableList();
         }
@@ -140,10 +144,12 @@ public class MainActivity extends AppCompatActivity implements IMain {
     private boolean removeTopFragment() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.mainFragmentContainer);
         if (fragment != null) {
+            if(fragment instanceof TableListFragment){
+                initLayout();
+            }
             mAddTodo.show();
             mFragmentContainer.setVisibility(View.GONE);
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();
-            initLayout();
             return true;
         } else {
             return false;

@@ -68,7 +68,8 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
     }
 
     public void setItems(List<Todo> todoList) {
-        mValues = todoList;
+        mValues.clear();
+        mValues.addAll(todoList);
         notifyDataSetChanged();
     }
 

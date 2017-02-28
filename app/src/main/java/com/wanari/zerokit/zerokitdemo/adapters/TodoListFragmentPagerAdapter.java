@@ -40,4 +40,10 @@ public class TodoListFragmentPagerAdapter extends FragmentPagerAdapter {
     public String getPageId(int position){
         return tabList.get(position).getId();
     }
+
+    public void setItems(List<Table> addedTables) {
+        this.tabList.clear();
+        this.tabList.addAll(addedTables);
+        notifyDataSetChanged();
+    }
 }
