@@ -19,13 +19,17 @@ public class Table implements Parcelable {
 
     private String title;
 
-    public Table(String title) {
+    private String tresorId;
+
+    public Table(String title, String tresorId) {
         this.title = title;
+        this.tresorId = tresorId;
     }
 
     public Table(String key, Map<String, String> dataSnapshot) {
         this.id = key;
         this.title = dataSnapshot.get("title");
+        this.tresorId = dataSnapshot.get("tresorId");
     }
 
     public String getId() {
@@ -36,10 +40,19 @@ public class Table implements Parcelable {
         return title;
     }
 
+    public String getTresorId() {
+        return tresorId;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
         result.put("title", title);
+        result.put("tresorId", tresorId);
         return result;
     }
 
@@ -52,11 +65,13 @@ public class Table implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.id);
         dest.writeString(this.title);
+        dest.writeString(this.tresorId);
     }
 
     protected Table(Parcel in) {
         this.id = in.readString();
         this.title = in.readString();
+        this.tresorId = in.readString();
     }
 
     public static final Parcelable.Creator<Table> CREATOR = new Parcelable.Creator<Table>() {
@@ -82,17 +97,21 @@ public class Table implements Parcelable {
 
         Table table = (Table) o;
 
-        if (!id.equals(table.id)) {
+        if (id != null ? !id.equals(table.id) : table.id != null) {
             return false;
         }
-        return title.equals(table.title);
+        if (title != null ? !title.equals(table.title) : table.title != null) {
+            return false;
+        }
+        return tresorId != null ? tresorId.equals(table.tresorId) : table.tresorId == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + title.hashCode();
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (tresorId != null ? tresorId.hashCode() : 0);
         return result;
     }
 }

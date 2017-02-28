@@ -80,7 +80,7 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
             if (TextUtils.isEmpty(userId)) {
                 showError(getString(R.string.alert_no_user));
             } else {
-                ZerokitManager.getInstance().getZerokit().login(userId, mPasswordExporter, true).subscribe(new Action1<ResponseZerokitLogin>() {
+                ZerokitManager.getInstance().getZerokit().login(userId, mPasswordExporter, false).subscribe(new Action1<ResponseZerokitLogin>() {
                     @Override
                     public void call(ResponseZerokitLogin responseLogin) {
                         mPasswordExporter.clear();

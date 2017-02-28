@@ -5,8 +5,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.wanari.zerokit.zerokitdemo.common.AppConf;
 import com.wanari.zerokit.zerokitdemo.entities.Table;
 import com.wanari.zerokit.zerokitdemo.entities.Todo;
+
+import android.support.annotation.Nullable;
 
 public final class FireBaseHelper {
 
@@ -31,7 +34,7 @@ public final class FireBaseHelper {
         return instance;
     }
 
-    public void getTableLists(ValueEventListener valueEventListener){
+    public void getTableLists(ValueEventListener valueEventListener) {
         databaseRef.child(DATABASE_TODO_LISTS).addValueEventListener(valueEventListener);
     }
 
@@ -44,10 +47,17 @@ public final class FireBaseHelper {
         if (key == null) {
             key = databaseRef.push().getKey();
             todo.setId(key);
-            databaseRef.child(DATABASE_TODO_LISTS).child(tableName).child(DATABASE_TODOS).child(key).setValue(todo).addOnSuccessListener(onSuccessListener);
-        } else {
-            databaseRef.child(DATABASE_TODO_LISTS).child(tableName).child(DATABASE_TODOS).child(key).updateChildren(todo.toMap()).addOnSuccessListener(onSuccessListener);
         }
+        databaseRef.child(DATABASE_TODO_LISTS).child(tableName).child(DATABASE_TODOS).child(key).setValue(todo)
+                .addOnSuccessListener(onSuccessListener);
+    }
+
+    public void saveTodo(@Nullable String key, String encryptedTodo, String tableName, OnSuccessListener onSuccessListener) {
+        if (key == null) {
+            key = databaseRef.push().getKey();
+        }
+        databaseRef.child(DATABASE_TODO_LISTS).child(tableName).child(DATABASE_TODOS).child(key).setValue(encryptedTodo)
+                .addOnSuccessListener(onSuccessListener);
     }
 
     public void deleteTodo(Todo todo, String tableName, DatabaseReference.CompletionListener completionListener) {
@@ -57,8 +67,10 @@ public final class FireBaseHelper {
         }
     }
 
-    public void saveTable(Table table){
+    public void saveTable(Table table) {
         String key = databaseRef.push().getKey();
+        table.setId(key);
+        AppConf.putTable(table);
         databaseRef.child(DATABASE_TODO_LISTS).child(key).setValue(table);
     }
 }

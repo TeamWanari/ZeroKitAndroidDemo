@@ -1,9 +1,14 @@
 package com.wanari.zerokit.zerokitdemo.fragments;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.Gson;
 
+import com.tresorit.zerokit.observer.Action1;
+import com.tresorit.zerokit.response.ResponseZerokitError;
 import com.wanari.zerokit.zerokitdemo.R;
+import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 import com.wanari.zerokit.zerokitdemo.database.FireBaseHelper;
+import com.wanari.zerokit.zerokitdemo.entities.Table;
 import com.wanari.zerokit.zerokitdemo.entities.Todo;
 import com.wanari.zerokit.zerokitdemo.interfaces.IMain;
 import com.wanari.zerokit.zerokitdemo.utils.ValidationUtils;
@@ -23,7 +28,7 @@ public class TodoDetailFragment extends Fragment {
 
     private static final String ARG_TODO = "todo";
 
-    private static final String ARG_TABLE_NAME = "TableName";
+    private static final String ARG_TABLE = "Table";
 
     private TextInputEditText mTodoDetailTitle;
 
@@ -39,16 +44,16 @@ public class TodoDetailFragment extends Fragment {
 
     private Todo selectedTodo;
 
-    private String selectedTableName;
+    private Table selectedTable;
 
     public TodoDetailFragment() {
     }
 
-    public static TodoDetailFragment newInstance(Todo todo, String tableName) {
+    public static TodoDetailFragment newInstance(Todo todo, Table table) {
         TodoDetailFragment fragment = new TodoDetailFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_TODO, todo);
-        args.putString(ARG_TABLE_NAME, tableName);
+        args.putParcelable(ARG_TABLE, table);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,7 +63,7 @@ public class TodoDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             selectedTodo = getArguments().getParcelable(ARG_TODO);
-            selectedTableName = getArguments().getString(ARG_TABLE_NAME);
+            selectedTable = getArguments().getParcelable(ARG_TABLE);
         }
     }
 
@@ -89,16 +94,29 @@ public class TodoDetailFragment extends Fragment {
                         selectedTodo.setTitle(mTodoDetailTitle.getText().toString());
                         selectedTodo.setDescription(mTodoDetailDescription.getText().toString());
                     }
-                    FireBaseHelper.getInstance()
-                            .saveTodo(selectedTodo, selectedTableName,
-                                    new OnSuccessListener() {
-                                        @Override
-                                        public void onSuccess(Object o) {
-                                            if (mainListener != null) {
-                                                mainListener.saveSuccess();
-                                            }
-                                        }
-                                    });
+                    mainListener.showProgress();
+                    ZerokitManager.getInstance().getZerokit().encrypt(selectedTable.getTresorId(), new Gson().toJson(selectedTodo)).subscribe(
+                            new Action1<String>() {
+                                @Override
+                                public void call(String encryptedTodo) {
+                                    FireBaseHelper.getInstance()
+                                            .saveTodo(selectedTodo.getId(), encryptedTodo, selectedTable.getId(),
+                                                    new OnSuccessListener() {
+                                                        @Override
+                                                        public void onSuccess(Object o) {
+                                                            if (mainListener != null) {
+                                                                mainListener.saveSuccess();
+                                                            }
+                                                        }
+                                                    });
+                                }
+                            }, new Action1<ResponseZerokitError>() {
+                                @Override
+                                public void call(ResponseZerokitError responseZerokitError) {
+                                    mainListener.showError(responseZerokitError.getMessage());
+                                }
+                            });
+
                 }
             }
         });

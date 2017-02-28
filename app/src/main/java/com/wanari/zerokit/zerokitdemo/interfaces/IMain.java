@@ -11,4 +11,10 @@ public interface IMain {
     void todoItemDelete(Todo item);
 
     void closeTableList();
+
+    void showProgress();
+
+    void hideProgress();
+
+    void showError(String message);
 }

@@ -47,16 +47,6 @@ public class SignInActivity extends AppCompatActivity implements ISignIn {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQ_DEFAULT:
-                finish();
-                break;
-        }
-    }
-
-    @Override
     public void showProgress() {
         runOnUiThread(new Runnable() {
             @Override

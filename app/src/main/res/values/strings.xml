@@ -16,4 +16,7 @@
     <string name="alert_no_user">\"No user id found for this user alias\"</string>
     <string name="table_list_header">Add table to your list or add new one</string>
     <string name="new_table">New table</string>
+    <string name="search_table_menu">Search table</string>
+    <string name="sign_out_menu">Sign out</string>
+    <string name="remember_me">Remember me</string>
 </resources>
