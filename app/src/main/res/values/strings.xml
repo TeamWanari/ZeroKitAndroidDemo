@@ -19,4 +19,8 @@
     <string name="search_table_menu">Search table</string>
     <string name="sign_out_menu">Sign out</string>
     <string name="remember_me">Remember me</string>
+    <string name="copy_userid">Copy UserId</string>
+    <string name="create_invitation">Create Invitation</string>
+    <string name="share">Share</string>
+    <string name="share_success">Share successed</string>
 </resources>

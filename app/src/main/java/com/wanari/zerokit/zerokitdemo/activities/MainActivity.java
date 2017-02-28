@@ -7,6 +7,7 @@ import com.tresorit.zerokit.observer.Action1;
 import com.tresorit.zerokit.response.ResponseZerokitError;
 import com.wanari.zerokit.zerokitdemo.R;
 import com.wanari.zerokit.zerokitdemo.adapters.TodoListFragmentPagerAdapter;
+import com.wanari.zerokit.zerokitdemo.adapters.UsersAutoCompleteAdapter;
 import com.wanari.zerokit.zerokitdemo.common.AppConf;
 import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 import com.wanari.zerokit.zerokitdemo.database.FireBaseHelper;
@@ -15,7 +16,14 @@ import com.wanari.zerokit.zerokitdemo.entities.Todo;
 import com.wanari.zerokit.zerokitdemo.fragments.TableListFragment;
 import com.wanari.zerokit.zerokitdemo.fragments.TodoDetailFragment;
 import com.wanari.zerokit.zerokitdemo.interfaces.IMain;
+import com.wanari.zerokit.zerokitdemo.rest.APIManager;
+import com.wanari.zerokit.zerokitdemo.rest.entities.ApproveShareJson;
+import com.wanari.zerokit.zerokitdemo.rest.entities.UserJson;
+import com.wanari.zerokit.zerokitdemo.rest.entities.UserResponseJson;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -25,14 +33,22 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements IMain {
 
@@ -68,22 +84,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
                 openTodoDetailFragment(null);
             }
         });
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Table currentTable = mTodoListFragmentPagerAdapter.getTable(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
         initLayout();
     }
 
@@ -132,9 +133,94 @@ public class MainActivity extends AppCompatActivity implements IMain {
             case R.id.sign_out:
                 signOut();
                 return true;
+            case R.id.copyUserId:
+                copyUserIdToClipboard();
+                return true;
+            case R.id.share:
+                showDialog();
+                return true;
+            case R.id.invite:
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showDialog() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        final AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) getLayoutInflater().inflate(R.layout.dialog_new_table, null);
+        APIManager.getInstance().getService().getUsers().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<UserResponseJson>() {
+            @Override
+            public void call(UserResponseJson userResponseJson) {
+                UsersAutoCompleteAdapter adapter = new UsersAutoCompleteAdapter(MainActivity.this, userResponseJson.getUsers());
+                autoCompleteTextView.setAdapter(adapter);
+            }
+        }, new rx.functions.Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                showMessage(throwable.getMessage());
+            }
+        });
+        alertBuilder.setView(autoCompleteTextView);
+        alertBuilder.setTitle(getString(R.string.share));
+        alertBuilder.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        if (autoCompleteTextView.getText() != null && autoCompleteTextView.getText().length() > 0) {
+                            shareTable(autoCompleteTextView.getText().toString());
+                        } else {
+                            Toast.makeText(MainActivity.this, getString(R.string.alert_empty), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+        alertBuilder.setNegativeButton(getString(android.R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+            }
+        });
+        alertBuilder.create().show();
+    }
+
+    private void shareTable(String userIdToShare) {
+        showProgress();
+        ZerokitManager.getInstance().getZerokit().shareTresor(getCurrentTable().getTresorId(), userIdToShare).subscribe(new Action1<String>() {
+            @Override
+            public void call(String operationId) {
+                APIManager.getInstance().getService().approveShare(new ApproveShareJson(operationId)).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<ResponseBody>() {
+                    @Override
+                    public void call(ResponseBody responseBody) {
+                        showMessage(getString(R.string.share_success));
+                    }
+                }, new rx.functions.Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        showMessage(throwable.getMessage());
+                    }
+                });
+            }
+        }, new Action1<ResponseZerokitError>() {
+            @Override
+            public void call(ResponseZerokitError responseZerokitError) {
+                showMessage(responseZerokitError.getMessage());
+            }
+        });
+    }
+
+    private void copyUserIdToClipboard() {
+        ZerokitManager.getInstance().getZerokit().whoAmI().subscribe(new Action1<String>() {
+            @Override
+            public void call(String userId) {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("User Id", userId);
+                clipboard.setPrimaryClip(clip);
+                showMessage("Copied User Id: " + userId);
+            }
+        });
     }
 
     private void signOut() {
@@ -147,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
         }, new Action1<ResponseZerokitError>() {
             @Override
             public void call(ResponseZerokitError responseZerokitError) {
-                showError(responseZerokitError.getMessage());
+                showMessage(responseZerokitError.getMessage());
             }
         });
     }
@@ -237,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
     }
 
     @Override
-    public void showError(String message) {
+    public void showMessage(String message) {
         hideProgress();
         Snackbar.make(mMainParent, message, Snackbar.LENGTH_SHORT).show();
     }

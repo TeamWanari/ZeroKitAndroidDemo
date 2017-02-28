@@ -16,5 +16,5 @@ public interface IMain {
 
     void hideProgress();
 
-    void showError(String message);
+    void showMessage(String message);
 }

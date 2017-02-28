@@ -114,7 +114,7 @@ public class TodoDetailFragment extends Fragment {
                             }, new Action1<ResponseZerokitError>() {
                                 @Override
                                 public void call(ResponseZerokitError responseZerokitError) {
-                                    mainListener.showError(responseZerokitError.getMessage());
+                                    mainListener.showMessage(responseZerokitError.getMessage());
                                 }
                             });
 

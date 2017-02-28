@@ -4,7 +4,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
-import com.tresorit.adminapi.AdminApi;
 import com.tresorit.zerokit.observer.Action1;
 import com.tresorit.zerokit.response.ResponseZerokitError;
 import com.wanari.zerokit.zerokitdemo.R;
@@ -38,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -116,36 +116,28 @@ public class TableListFragment extends Fragment implements ITableList {
         ZerokitManager.getInstance().getZerokit().createTresor().subscribe(new Action1<String>() {
             @Override
             public void call(final String tresorId) {
-                ZerokitManager.getInstance().getAdminApi().approveTresorCreation(tresorId).subscribe(new Action1<String>() {
+                APIManager.getInstance().getService().approveTresorCreation(new ApproveTresorCreationJson(tresorId)).subscribeOn(
+                        Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<ResponseBody>() {
                     @Override
-                    public void call(String response) {
+                    public void call(ResponseBody responseBody) {
                         FireBaseHelper.getInstance().saveTable(new Table(tableName, tresorId));
-
                         parentListener.hideProgress();
                     }
+                }, new rx.functions.Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.e(TableListFragment.class.getName(), throwable.getMessage());
+                        parentListener.showMessage(throwable.getMessage());
+                    }
                 });
-//                APIManager.getInstance().getService().approveTresorCreation(new ApproveTresorCreationJson(tresorId)).subscribeOn(
-//                        Schedulers.io())
-//                        .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<ApproveTresorCreationJson>() {
-//                    @Override
-//                    public void call(ApproveTresorCreationJson approveTresorCreationJson) {
-//                        FireBaseHelper.getInstance().saveTable(new Table(tableName, approveTresorCreationJson.getTresorId()));
-//                        parentListener.hideProgress();
-//                    }
-//                }, new rx.functions.Action1<Throwable>() {
-//                    @Override
-//                    public void call(Throwable throwable) {
-//                        Log.e(TableListFragment.class.getName(), throwable.getMessage());
-//                        parentListener.showError(throwable.getMessage());
-//                    }
-//                });
 
             }
         }, new Action1<ResponseZerokitError>() {
             @Override
             public void call(ResponseZerokitError responseZerokitError) {
                 Log.e(TableListFragment.class.getName(), responseZerokitError.getMessage());
-                parentListener.showError(responseZerokitError.getMessage());
+                parentListener.showMessage(responseZerokitError.getMessage());
             }
         });
     }
