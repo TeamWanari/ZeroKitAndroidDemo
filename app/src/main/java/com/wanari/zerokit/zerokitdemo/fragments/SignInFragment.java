@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 
 public class SignInFragment extends Fragment implements TextWatcher, View.OnFocusChangeListener {
 
@@ -36,6 +37,8 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
     private TextInputLayout passwordContainer;
 
     private Button signInBtn;
+
+    private CheckBox rememberMeCheckBox;
 
     private ISignIn parentListener;
 
@@ -51,6 +54,8 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
 
         passwordEditText = (PasswordEditText) view.findViewById(R.id.passwordEditText);
         passwordContainer = (TextInputLayout) view.findViewById(R.id.passwordTextInputLayout);
+
+        rememberMeCheckBox = (CheckBox) view.findViewById(R.id.remembarMe);
 
         signInBtn = (Button) view.findViewById(R.id.signInBtn);
         setListeners();
@@ -80,18 +85,19 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
             if (TextUtils.isEmpty(userId)) {
                 showError(getString(R.string.alert_no_user));
             } else {
-                ZerokitManager.getInstance().getZerokit().login(userId, mPasswordExporter, false).subscribe(new Action1<ResponseZerokitLogin>() {
-                    @Override
-                    public void call(ResponseZerokitLogin responseLogin) {
-                        mPasswordExporter.clear();
-                        loginSuccess();
-                    }
-                }, new Action1<ResponseZerokitError>() {
-                    @Override
-                    public void call(ResponseZerokitError responseZerokitError) {
-                        showError(responseZerokitError.getMessage());
-                    }
-                });
+                ZerokitManager.getInstance().getZerokit().login(userId, mPasswordExporter, rememberMeCheckBox.isChecked())
+                        .subscribe(new Action1<ResponseZerokitLogin>() {
+                            @Override
+                            public void call(ResponseZerokitLogin responseLogin) {
+                                mPasswordExporter.clear();
+                                loginSuccess();
+                            }
+                        }, new Action1<ResponseZerokitError>() {
+                            @Override
+                            public void call(ResponseZerokitError responseZerokitError) {
+                                showError(responseZerokitError.getMessage());
+                            }
+                        });
             }
         }
     }

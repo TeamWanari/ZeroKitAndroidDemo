@@ -73,7 +73,7 @@ public class TodoListFragment extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Todo> todoList = new ArrayList<>();
                 for (DataSnapshot todoSnapshot : dataSnapshot.getChildren()) {
-                    Map<String, String> map = (HashMap<String, String>) todoSnapshot.getValue();
+                    String map = (String) todoSnapshot.getValue();
                     Todo todoItem = new Todo(todoSnapshot.getKey(), map);
                     todoList.add(todoItem);
                 }

@@ -115,10 +115,10 @@ public class TableListFragment extends Fragment implements ITableList {
         parentListener.showProgress();
         ZerokitManager.getInstance().getZerokit().createTresor().subscribe(new Action1<String>() {
             @Override
-            public void call(String tresorId) {
+            public void call(final String tresorId) {
                 ZerokitManager.getInstance().getAdminApi().approveTresorCreation(tresorId).subscribe(new Action1<String>() {
                     @Override
-                    public void call(String tresorId) {
+                    public void call(String response) {
                         FireBaseHelper.getInstance().saveTable(new Table(tableName, tresorId));
 
                         parentListener.hideProgress();

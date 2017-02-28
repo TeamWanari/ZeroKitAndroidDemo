@@ -68,6 +68,22 @@ public class MainActivity extends AppCompatActivity implements IMain {
                 openTodoDetailFragment(null);
             }
         });
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Table currentTable = mTodoListFragmentPagerAdapter.getTable(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         initLayout();
     }
 

@@ -9,27 +9,32 @@ import android.os.Parcelable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.R.attr.author;
-
 @IgnoreExtraProperties
 public class Todo implements Parcelable {
 
-    @Exclude
-    private String id;
+    private transient String id;
 
     private String title;
 
     private String description;
 
-    public Todo(String title, String description) {
-        this.title = title;
-        this.description = description;
+    private transient String encryptedTodo;
+
+    private transient boolean isDecrypted;
+
+    public Todo(String id, String encryptedTodo) {
+        this.id = id;
+        this.encryptedTodo = encryptedTodo;
     }
 
     public Todo(String key, Map<String, String> dataSnapshot) {
         this.id = key;
         this.title = dataSnapshot.get("title");
         this.description = dataSnapshot.get("description");
+    }
+
+    public Todo() {
+
     }
 
     public String getId() {
@@ -56,6 +61,18 @@ public class Todo implements Parcelable {
         this.description = description;
     }
 
+    public String getEncryptedTodo() {
+        return encryptedTodo;
+    }
+
+    public boolean isDecrypted() {
+        return isDecrypted;
+    }
+
+    public void setDecrypted(boolean decrypted) {
+        isDecrypted = decrypted;
+    }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
@@ -71,13 +88,11 @@ public class Todo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
         dest.writeString(this.title);
         dest.writeString(this.description);
     }
 
     protected Todo(Parcel in) {
-        this.id = in.readString();
         this.title = in.readString();
         this.description = in.readString();
     }

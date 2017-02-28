@@ -89,13 +89,14 @@ public class TodoDetailFragment extends Fragment {
                 closeKeyboard();
                 if (ValidationUtils.hasText(mTodoDetailTitleContainer) && ValidationUtils.hasText(mTodoDetailDescriptionContainer)) {
                     if (selectedTodo == null) {
-                        selectedTodo = new Todo(mTodoDetailTitle.getText().toString(), mTodoDetailDescription.getText().toString());
-                    } else {
-                        selectedTodo.setTitle(mTodoDetailTitle.getText().toString());
-                        selectedTodo.setDescription(mTodoDetailDescription.getText().toString());
+                        selectedTodo = new Todo();
                     }
+                    selectedTodo.setTitle(mTodoDetailTitle.getText().toString());
+                    selectedTodo.setDescription(mTodoDetailDescription.getText().toString());
+
                     mainListener.showProgress();
-                    ZerokitManager.getInstance().getZerokit().encrypt(selectedTable.getTresorId(), new Gson().toJson(selectedTodo)).subscribe(
+                    String todoString = new Gson().toJson(selectedTodo);
+                    ZerokitManager.getInstance().getZerokit().encrypt(selectedTable.getTresorId(), todoString).subscribe(
                             new Action1<String>() {
                                 @Override
                                 public void call(String encryptedTodo) {

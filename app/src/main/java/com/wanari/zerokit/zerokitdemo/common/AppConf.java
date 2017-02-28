@@ -51,8 +51,7 @@ public class AppConf {
 
     public static List<Table> getAddedTableNames() {
         init();
-        List<Table> tableNames;
-        tableNames = new Gson().fromJson(sharedPreferences.getString(KEY_TABLE_NAMES, ""), new TypeToken<List<Table>>() {
+        List<Table> tableNames = new Gson().fromJson(sharedPreferences.getString(KEY_TABLE_NAMES, ""), new TypeToken<List<Table>>() {
         }.getType());
         if (tableNames == null) {
             tableNames = new ArrayList<>();
