@@ -67,10 +67,10 @@ public final class FireBaseHelper {
         }
     }
 
-    public void saveTable(Table table) {
+    public void saveTable(String userId, Table table) {
         String key = databaseRef.push().getKey();
         table.setId(key);
-        AppConf.putTable(table);
+        AppConf.putTable(userId, table);
         databaseRef.child(DATABASE_TODO_LISTS).child(key).setValue(table);
     }
 }

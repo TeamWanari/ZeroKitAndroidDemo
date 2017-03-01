@@ -8,14 +8,11 @@ import com.wanari.zerokit.zerokitdemo.entities.Table;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AppConf {
-
-    private static final String KEY_TABLE_NAMES = "KEY_TABLE_NAMES";
 
     private static SharedPreferences sharedPreferences;
 
@@ -26,36 +23,35 @@ public class AppConf {
         }
     }
 
-    public static void putUserId(String alias, String userId) {
+    public static void putTable(String userId, Table table) {
         init();
-        sharedPreferences.edit().putString(alias, userId).apply();
-    }
-
-    public static
-    @Nullable
-    String getUserId(String alias) {
-        init();
-        return sharedPreferences.getString(alias, null);
-    }
-
-    public static void putTable(Table table) {
-        init();
-        List<Table> tableNames = getAddedTableNames();
-        if (!tableNames.contains(table)) {
-            tableNames.add(table);
+        List<Table> tables = getAddedTables(userId);
+        if (!tables.contains(table)) {
+            tables.add(table);
         }
-        String tableNamesString = new Gson().toJson(tableNames, new TypeToken<List<Table>>() {
-        }.getType());
-        sharedPreferences.edit().putString(KEY_TABLE_NAMES, tableNamesString).apply();
+        storeTables(userId, tables);
     }
 
-    public static List<Table> getAddedTableNames() {
+    private static void storeTables(String userId, List<Table> tables) {
+        String tableNamesString = new Gson().toJson(tables, new TypeToken<List<Table>>() {
+        }.getType());
+        sharedPreferences.edit().putString(userId, tableNamesString).apply();
+    }
+
+    public static List<Table> getAddedTables(String userId) {
         init();
-        List<Table> tableNames = new Gson().fromJson(sharedPreferences.getString(KEY_TABLE_NAMES, ""), new TypeToken<List<Table>>() {
+        List<Table> tableNames = new Gson().fromJson(sharedPreferences.getString(userId, ""), new TypeToken<List<Table>>() {
         }.getType());
         if (tableNames == null) {
             tableNames = new ArrayList<>();
         }
         return tableNames;
+    }
+
+    public static void removeTable(String userId, Table table) {
+        init();
+        List<Table> tables = getAddedTables(userId);
+        tables.remove(table);
+        storeTables(userId, tables);
     }
 }

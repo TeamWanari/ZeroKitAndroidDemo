@@ -121,7 +121,6 @@ public class TodoDetailFragment extends Fragment {
                 }
             }
         });
-
         return view;
     }
 

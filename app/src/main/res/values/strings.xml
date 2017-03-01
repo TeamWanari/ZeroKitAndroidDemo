@@ -23,4 +23,6 @@
     <string name="create_invitation">Create Invitation</string>
     <string name="share">Share</string>
     <string name="share_success">Share successed</string>
+    <string name="alert_already_registered">Already registered with this username</string>
+    <string name="remove_table">Remove Table</string>
 </resources>

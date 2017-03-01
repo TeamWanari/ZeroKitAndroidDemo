@@ -79,9 +79,11 @@ public class SignInActivity extends AppCompatActivity implements ISignIn {
     }
 
     @Override
-    public void loginSuccess() {
+    public void loginSuccess(String userId) {
         hideProgress();
-        startActivity(new Intent(SignInActivity.this, MainActivity.class));
+        Intent mainIntent = new Intent(SignInActivity.this, MainActivity.class);
+        mainIntent.putExtra(MainActivity.BUNDLE_USERID, userId);
+        startActivity(mainIntent);
         finish();
     }
 }

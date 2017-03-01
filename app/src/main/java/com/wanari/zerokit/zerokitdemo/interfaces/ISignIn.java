@@ -10,5 +10,5 @@ public interface ISignIn {
 
     void navigateToSignIn();
 
-    void loginSuccess();
+    void loginSuccess(String userId);
 }

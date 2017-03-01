@@ -10,6 +10,7 @@ import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 import com.wanari.zerokit.zerokitdemo.interfaces.ISignIn;
 import com.wanari.zerokit.zerokitdemo.rest.APIManager;
 import com.wanari.zerokit.zerokitdemo.rest.entities.InitUserResponseJson;
+import com.wanari.zerokit.zerokitdemo.rest.entities.UserJson;
 import com.wanari.zerokit.zerokitdemo.rest.entities.ValidateUserRequestJson;
 import com.wanari.zerokit.zerokitdemo.utils.ValidationUtils;
 
@@ -99,49 +100,62 @@ public class SignUpFragment extends Fragment implements TextWatcher, View.OnFocu
             if (mPasswordExporter.isContentEqual(mPasswordConfirmExporter)) {
                 final String alias = usernameEditText.getText().toString();
                 showProgress();
-                APIManager.getInstance().getService().initUserRegistration().subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<InitUserResponseJson>() {
-                    @Override
-                    public void call(final InitUserResponseJson initUserResponseJson) {
-                        Action1<ResponseZerokitRegister> responseZerokitRegisterAction = new Action1<ResponseZerokitRegister>() {
+                APIManager.getInstance().getService().getUserIdByUserName(alias).observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io()).subscribe(
+                        new rx.functions.Action1<UserJson>() {
                             @Override
-                            public void call(ResponseZerokitRegister responseZerokitRegister) {
-                                ValidateUserRequestJson requestJson = new ValidateUserRequestJson(initUserResponseJson.getUserId(),
-                                        initUserResponseJson.getRegSessionId(), responseZerokitRegister.getRegValidationVerifier());
-
-                                APIManager.getInstance().getService().validateUserRegistration(requestJson).subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe(new rx.functions.Action1<ResponseBody>() {
-                                            @Override
-                                            public void call(ResponseBody response) {
-                                                AppConf.putUserId(alias, initUserResponseJson.getUserId());
-                                                mPasswordExporter.clear();
-                                                mPasswordConfirmExporter.clear();
-                                                registrationSuccess();
-                                            }
-                                        }, new rx.functions.Action1<Throwable>() {
-                                            @Override
-                                            public void call(Throwable throwable) {
-                                                showError(throwable.getMessage());
-                                            }
-                                        });
+                            public void call(UserJson user) {
+                                showError(getString(R.string.alert_already_registered));
                             }
-                        };
-                        ZerokitManager.getInstance().getZerokit()
-                                .register(initUserResponseJson.getUserId(), initUserResponseJson.getRegSessionId(), mPasswordExporter)
-                                .subscribe(responseZerokitRegisterAction, new Action1<ResponseZerokitError>() {
+                        }, new rx.functions.Action1<Throwable>() {
+                            @Override
+                            public void call(Throwable throwable) {
+                                APIManager.getInstance().getService().initUserRegistration().subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<InitUserResponseJson>() {
                                     @Override
-                                    public void call(ResponseZerokitError responseZerokitError) {
-                                        showError(responseZerokitError.getMessage());
+                                    public void call(final InitUserResponseJson initUserResponseJson) {
+                                        Action1<ResponseZerokitRegister> responseZerokitRegisterAction = new Action1<ResponseZerokitRegister>() {
+                                            @Override
+                                            public void call(ResponseZerokitRegister responseZerokitRegister) {
+                                                ValidateUserRequestJson requestJson = new ValidateUserRequestJson(initUserResponseJson.getUserId(),
+                                                        alias,
+                                                        initUserResponseJson.getRegSessionId(), responseZerokitRegister.getRegValidationVerifier());
+
+                                                APIManager.getInstance().getService().validateUserRegistration(requestJson)
+                                                        .subscribeOn(Schedulers.io())
+                                                        .observeOn(AndroidSchedulers.mainThread())
+                                                        .subscribe(new rx.functions.Action1<ResponseBody>() {
+                                                            @Override
+                                                            public void call(ResponseBody response) {
+                                                                mPasswordExporter.clear();
+                                                                mPasswordConfirmExporter.clear();
+                                                                registrationSuccess();
+                                                            }
+                                                        }, new rx.functions.Action1<Throwable>() {
+                                                            @Override
+                                                            public void call(Throwable throwable) {
+                                                                showError(throwable.getMessage());
+                                                            }
+                                                        });
+                                            }
+                                        };
+                                        ZerokitManager.getInstance().getZerokit()
+                                                .register(initUserResponseJson.getUserId(), initUserResponseJson.getRegSessionId(), mPasswordExporter)
+                                                .subscribe(responseZerokitRegisterAction, new Action1<ResponseZerokitError>() {
+                                                    @Override
+                                                    public void call(ResponseZerokitError responseZerokitError) {
+                                                        showError(responseZerokitError.getMessage());
+                                                    }
+                                                });
+                                    }
+                                }, new rx.functions.Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable throwable) {
+                                        showError(throwable.getMessage());
                                     }
                                 });
-                    }
-                }, new rx.functions.Action1<Throwable>() {
-                    @Override
-                    public void call(Throwable throwable) {
-                        showError(throwable.getMessage());
-                    }
-                });
+                            }
+                        });
             } else {
                 showError(getString(R.string.alert_not_identical));
             }

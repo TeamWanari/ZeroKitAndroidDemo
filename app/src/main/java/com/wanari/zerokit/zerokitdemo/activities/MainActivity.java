@@ -3,7 +3,9 @@ package com.wanari.zerokit.zerokitdemo.activities;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 
+import com.tresorit.zerokit.PasswordEditText;
 import com.tresorit.zerokit.observer.Action1;
+import com.tresorit.zerokit.response.ResponseZerokitCreateInvitationLink;
 import com.tresorit.zerokit.response.ResponseZerokitError;
 import com.wanari.zerokit.zerokitdemo.R;
 import com.wanari.zerokit.zerokitdemo.adapters.TodoListFragmentPagerAdapter;
@@ -17,9 +19,9 @@ import com.wanari.zerokit.zerokitdemo.fragments.TableListFragment;
 import com.wanari.zerokit.zerokitdemo.fragments.TodoDetailFragment;
 import com.wanari.zerokit.zerokitdemo.interfaces.IMain;
 import com.wanari.zerokit.zerokitdemo.rest.APIManager;
+import com.wanari.zerokit.zerokitdemo.rest.entities.ApproveInvitationCreationJson;
 import com.wanari.zerokit.zerokitdemo.rest.entities.ApproveShareJson;
 import com.wanari.zerokit.zerokitdemo.rest.entities.UserJson;
-import com.wanari.zerokit.zerokitdemo.rest.entities.UserResponseJson;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -39,7 +41,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -51,6 +53,8 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements IMain {
+
+    public static final String BUNDLE_USERID = "userId";
 
     private CoordinatorLayout mMainParent;
 
@@ -68,10 +72,17 @@ public class MainActivity extends AppCompatActivity implements IMain {
 
     private MenuItem mSearchMenuItem;
 
+    private String userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (getIntent() != null && getIntent().hasExtra(BUNDLE_USERID)) {
+            userId = getIntent().getStringExtra(BUNDLE_USERID);
+        }
+
         mMainParent = (CoordinatorLayout) findViewById(R.id.activity_main);
         mTabLayout = (TabLayout) findViewById(R.id.mainTabLayout);
         mViewPager = (ViewPager) findViewById(R.id.mainViewPager);
@@ -84,12 +95,11 @@ public class MainActivity extends AppCompatActivity implements IMain {
                 openTodoDetailFragment(null);
             }
         });
-
         initLayout();
     }
 
     private void initLayout() {
-        List<Table> addedTables = AppConf.getAddedTableNames();
+        List<Table> addedTables = AppConf.getAddedTables(userId);
         if (addedTables.size() > 0) {
             if (mTodoListFragmentPagerAdapter == null) {
                 mTodoListFragmentPagerAdapter = new TodoListFragmentPagerAdapter(getSupportFragmentManager(), addedTables);
@@ -140,22 +150,69 @@ public class MainActivity extends AppCompatActivity implements IMain {
                 showDialog();
                 return true;
             case R.id.invite:
-
+                showInvitationDialog();
+                return true;
+            case R.id.removeTable:
+                Table tableToRemove = getCurrentTable();
+                mTodoListFragmentPagerAdapter.deleteTable(tableToRemove);
+                AppConf.removeTable(userId, tableToRemove);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    private void showInvitationDialog() {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+    }
+
+    private void createInvitation(String message, PasswordEditText.PasswordExporter passwordExporter) {
+        showProgress();
+        ZerokitManager.getInstance().getZerokit().createInvitationLink("linkbase", getCurrentTable().getTresorId(), message, passwordExporter)
+                .subscribe(
+                        new Action1<ResponseZerokitCreateInvitationLink>() {
+                            @Override
+                            public void call(final ResponseZerokitCreateInvitationLink responseZerokitCreateInvitationLink) {
+                                ApproveInvitationCreationJson requestJson = new ApproveInvitationCreationJson(
+                                        responseZerokitCreateInvitationLink.getUrl());
+                                APIManager.getInstance().getService().approveInvitationCreation(requestJson).observeOn(AndroidSchedulers.mainThread())
+                                        .subscribeOn(Schedulers.io()).subscribe(
+                                        new rx.functions.Action1<ResponseBody>() {
+                                            @Override
+                                            public void call(ResponseBody responseBody) {
+                                                copyToClipBoard("Invitation link: ", responseZerokitCreateInvitationLink.getUrl());
+                                            }
+                                        }, new rx.functions.Action1<Throwable>() {
+                                            @Override
+                                            public void call(Throwable throwable) {
+                                                showMessage(throwable.getMessage());
+                                            }
+                                        });
+                            }
+                        }, new Action1<ResponseZerokitError>() {
+                            @Override
+                            public void call(ResponseZerokitError responseZerokitError) {
+                                showMessage(responseZerokitError.getMessage());
+                            }
+                        });
+    }
+
     private void showDialog() {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         final AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) getLayoutInflater().inflate(R.layout.dialog_new_table, null);
         APIManager.getInstance().getService().getUsers().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<UserResponseJson>() {
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<List<UserJson>>() {
             @Override
-            public void call(UserResponseJson userResponseJson) {
-                UsersAutoCompleteAdapter adapter = new UsersAutoCompleteAdapter(MainActivity.this, userResponseJson.getUsers());
+            public void call(List<UserJson> users) {
+                final UsersAutoCompleteAdapter adapter = new UsersAutoCompleteAdapter(MainActivity.this, users);
                 autoCompleteTextView.setAdapter(adapter);
+                autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        UserJson userJson = (UserJson) adapterView.getItemAtPosition(i);
+                        adapter.setSelectedUser(userJson);
+                    }
+                });
             }
         }, new rx.functions.Action1<Throwable>() {
             @Override
@@ -168,8 +225,9 @@ public class MainActivity extends AppCompatActivity implements IMain {
         alertBuilder.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        if (autoCompleteTextView.getText() != null && autoCompleteTextView.getText().length() > 0) {
-                            shareTable(autoCompleteTextView.getText().toString());
+                        UserJson selectedUser = ((UsersAutoCompleteAdapter) autoCompleteTextView.getAdapter()).getSelectedUser();
+                        if (selectedUser != null) {
+                            shareTable(selectedUser.getUserId());
                         } else {
                             Toast.makeText(MainActivity.this, getString(R.string.alert_empty), Toast.LENGTH_SHORT).show();
                         }
@@ -215,12 +273,16 @@ public class MainActivity extends AppCompatActivity implements IMain {
         ZerokitManager.getInstance().getZerokit().whoAmI().subscribe(new Action1<String>() {
             @Override
             public void call(String userId) {
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("User Id", userId);
-                clipboard.setPrimaryClip(clip);
+                copyToClipBoard("User id:", userId);
                 showMessage("Copied User Id: " + userId);
             }
         });
+    }
+
+    private void copyToClipBoard(String label, String toCopy) {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText(label, toCopy);
+        clipboard.setPrimaryClip(clip);
     }
 
     private void signOut() {
@@ -258,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
     }
 
     private void openTableList() {
-        openFragment(TableListFragment.newInstance(), TableListFragment.class.getName());
+        openFragment(TableListFragment.newInstance(userId), TableListFragment.class.getName());
     }
 
     private void openTodoDetailFragment(@Nullable Todo todo) {

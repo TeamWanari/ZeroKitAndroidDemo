@@ -43,6 +43,8 @@ import rx.schedulers.Schedulers;
 
 public class TableListFragment extends Fragment implements ITableList {
 
+    private static final String ARG_USERID = "userId";
+
     private RecyclerView mTableList;
 
     private Button mAddNewTableBtn;
@@ -51,11 +53,14 @@ public class TableListFragment extends Fragment implements ITableList {
 
     private IMain parentListener;
 
-    public static TableListFragment newInstance() {
+    private String userId;
+
+    public static TableListFragment newInstance(String userId) {
 
         Bundle args = new Bundle();
 
         TableListFragment fragment = new TableListFragment();
+        args.putString(ARG_USERID, userId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,6 +68,9 @@ public class TableListFragment extends Fragment implements ITableList {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            userId = getArguments().getString(ARG_USERID);
+        }
     }
 
     @Nullable
@@ -121,7 +129,7 @@ public class TableListFragment extends Fragment implements ITableList {
                         .observeOn(AndroidSchedulers.mainThread()).subscribe(new rx.functions.Action1<ResponseBody>() {
                     @Override
                     public void call(ResponseBody responseBody) {
-                        FireBaseHelper.getInstance().saveTable(new Table(tableName, tresorId));
+                        FireBaseHelper.getInstance().saveTable(userId, new Table(tableName, tresorId));
                         parentListener.hideProgress();
                     }
                 }, new rx.functions.Action1<Throwable>() {
@@ -147,7 +155,7 @@ public class TableListFragment extends Fragment implements ITableList {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Table> tableNames = new ArrayList<>();
-                List<Table> alreadyAddedList = AppConf.getAddedTableNames();
+                List<Table> alreadyAddedList = AppConf.getAddedTables(userId);
                 for (DataSnapshot tableSnapshot : dataSnapshot.getChildren()) {
                     Map<String, String> map = (HashMap<String, String>) tableSnapshot.getValue();
                     Table table = new Table(tableSnapshot.getKey(), map);
@@ -176,7 +184,7 @@ public class TableListFragment extends Fragment implements ITableList {
 
     @Override
     public void tableItemSelected(Table table) {
-        AppConf.putTable(table);
+        AppConf.putTable(userId, table);
         mTableRecyclerViewAdapter.removeItem(table);
     }
 

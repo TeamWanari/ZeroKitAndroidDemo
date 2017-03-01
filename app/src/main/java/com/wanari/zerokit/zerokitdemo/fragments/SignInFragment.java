@@ -5,9 +5,10 @@ import com.tresorit.zerokit.observer.Action1;
 import com.tresorit.zerokit.response.ResponseZerokitError;
 import com.tresorit.zerokit.response.ResponseZerokitLogin;
 import com.wanari.zerokit.zerokitdemo.R;
-import com.wanari.zerokit.zerokitdemo.common.AppConf;
 import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 import com.wanari.zerokit.zerokitdemo.interfaces.ISignIn;
+import com.wanari.zerokit.zerokitdemo.rest.APIManager;
+import com.wanari.zerokit.zerokitdemo.rest.entities.UserJson;
 import com.wanari.zerokit.zerokitdemo.utils.ValidationUtils;
 
 import android.app.Activity;
@@ -18,13 +19,15 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class SignInFragment extends Fragment implements TextWatcher, View.OnFocusChangeListener {
 
@@ -81,30 +84,42 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
         if (ValidationUtils.hasText(usernameContainer) && ValidationUtils.hasText(passwordContainer, mPasswordExporter)) {
             showProgress();
             String alias = usernameEditText.getText().toString();
-            String userId = AppConf.getUserId(alias);
-            if (TextUtils.isEmpty(userId)) {
-                showError(getString(R.string.alert_no_user));
-            } else {
-                ZerokitManager.getInstance().getZerokit().login(userId, mPasswordExporter, rememberMeCheckBox.isChecked())
-                        .subscribe(new Action1<ResponseZerokitLogin>() {
-                            @Override
-                            public void call(ResponseZerokitLogin responseLogin) {
-                                mPasswordExporter.clear();
-                                loginSuccess();
-                            }
-                        }, new Action1<ResponseZerokitError>() {
-                            @Override
-                            public void call(ResponseZerokitError responseZerokitError) {
-                                showError(responseZerokitError.getMessage());
-                            }
-                        });
-            }
+
+            APIManager.getInstance().getService().getUserIdByUserName(alias).observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io()).subscribe(
+                    new rx.functions.Action1<UserJson>() {
+                        @Override
+                        public void call(UserJson user) {
+                            login(user.getUserId());
+                        }
+                    }, new rx.functions.Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            showError(getString(R.string.alert_no_user));
+                        }
+                    });
         }
     }
 
-    private void loginSuccess() {
+    private void login(final String userId) {
+        ZerokitManager.getInstance().getZerokit().login(userId, mPasswordExporter, rememberMeCheckBox.isChecked())
+                .subscribe(new Action1<ResponseZerokitLogin>() {
+                    @Override
+                    public void call(ResponseZerokitLogin responseLogin) {
+                        mPasswordExporter.clear();
+                        loginSuccess(userId);
+                    }
+                }, new Action1<ResponseZerokitError>() {
+                    @Override
+                    public void call(ResponseZerokitError responseZerokitError) {
+                        showError(responseZerokitError.getMessage());
+                    }
+                });
+    }
+
+    private void loginSuccess(String userId) {
         if (parentListener != null) {
-            parentListener.loginSuccess();
+            parentListener.loginSuccess(userId);
         }
     }
 

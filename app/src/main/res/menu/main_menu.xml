@@ -17,6 +17,9 @@
             android:id="@+id/invite"
             android:title="@string/create_invitation"/>
     <item
+            android:id="@+id/removeTable"
+            android:title="@string/remove_table"/>
+    <item
             android:id="@+id/sign_out"
             android:icon="@drawable/ic_sign_out"
             android:title="@string/sign_out_menu"/>

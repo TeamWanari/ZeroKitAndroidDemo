@@ -7,14 +7,14 @@ public class UserJson {
     @SerializedName("UserId")
     private String userId;
 
-    @SerializedName("UserRegistrationState")
-    private String registrationState;
+    @SerializedName("UserName")
+    private String userName;
 
     public String getUserId() {
         return userId;
     }
 
-    public String getRegistrationState() {
-        return registrationState;
+    public String getUserName() {
+        return userName;
     }
 }
