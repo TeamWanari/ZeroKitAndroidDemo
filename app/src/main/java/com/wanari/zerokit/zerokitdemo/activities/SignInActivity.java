@@ -18,8 +18,6 @@ import android.widget.ViewFlipper;
 
 public class SignInActivity extends AppCompatActivity implements ISignIn {
 
-    private static final int REQ_DEFAULT = 0;
-
     private BottomNavigationView mBottomNavigationView;
 
     private ViewFlipper mViewFlipper;
@@ -82,7 +80,6 @@ public class SignInActivity extends AppCompatActivity implements ISignIn {
     public void loginSuccess(String userId) {
         hideProgress();
         Intent mainIntent = new Intent(SignInActivity.this, MainActivity.class);
-        mainIntent.putExtra(MainActivity.BUNDLE_USERID, userId);
         startActivity(mainIntent);
         finish();
     }

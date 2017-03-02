@@ -25,4 +25,15 @@
     <string name="share_success">Share successed</string>
     <string name="alert_already_registered">Already registered with this username</string>
     <string name="remove_table">Remove Table</string>
+    <string name="message_hint">Message</string>
+    <string name="invite_title">Create invitation</string>
+    <string name="create_btn">Create</string>
+    <string name="cancel_btn">Cancel</string>
+    <string name="filter_invitation">Filter invitation</string>
+    <string name="accept_btn">Accept</string>
+    <string name="invitation_msg">Invitation message:</string>
+    <string name="invite_accept">Invitation</string>
+    <string name="accept_success">Success</string>
+    <string name="invitation_success">Invitation successed</string>
+    <string name="refresh_table">Refresh Table</string>
 </resources>

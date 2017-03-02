@@ -65,18 +65,13 @@ public class TableListFragment extends Fragment implements ITableList {
         return fragment;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            userId = getArguments().getString(ARG_USERID);
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tablelist, container, false);
+        if (getArguments() != null) {
+            userId = getArguments().getString(ARG_USERID);
+        }
         mTableList = (RecyclerView) view.findViewById(R.id.tableList);
         mAddNewTableBtn = (Button) view.findViewById(R.id.aaddNewTableBtn);
         setListeners();
@@ -95,7 +90,7 @@ public class TableListFragment extends Fragment implements ITableList {
 
     private void showDialog() {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getContext());
-        final EditText newTableEdit = (EditText) getActivity().getLayoutInflater().inflate(R.layout.dialog_new_table, null);
+        final EditText newTableEdit = (EditText) getActivity().getLayoutInflater().inflate(R.layout.dialog_autocomplete, null);
         alertBuilder.setView(newTableEdit);
         alertBuilder.setTitle(getString(R.string.new_table));
         alertBuilder.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {

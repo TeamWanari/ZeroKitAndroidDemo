@@ -19,8 +19,6 @@ public class UsersAutoCompleteAdapter extends ArrayAdapter<UserJson> {
 
     private List<UserJson> mUsers;
 
-    private UserJson selectedUser;
-
     private Filter mFilter = new Filter() {
         @Override
         public String convertResultToString(Object resultValue) {
@@ -81,13 +79,5 @@ public class UsersAutoCompleteAdapter extends ArrayAdapter<UserJson> {
         userId.setText(user.getUserId());
         userName.setText(user.getUserName());
         return convertView;
-    }
-
-    public UserJson getSelectedUser() {
-        return selectedUser;
-    }
-
-    public void setSelectedUser(UserJson selectedUser) {
-        this.selectedUser = selectedUser;
     }
 }

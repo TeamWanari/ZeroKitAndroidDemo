@@ -48,10 +48,11 @@ public class AppConf {
         return tableNames;
     }
 
-    public static void removeTable(String userId, Table table) {
+    public static int removeTable(String userId, Table table) {
         init();
         List<Table> tables = getAddedTables(userId);
         tables.remove(table);
         storeTables(userId, tables);
+        return tables.size();
     }
 }

@@ -20,6 +20,9 @@
             android:id="@+id/removeTable"
             android:title="@string/remove_table"/>
     <item
+            android:id="@+id/refreshTable"
+            android:title="@string/refresh_table"/>
+    <item
             android:id="@+id/sign_out"
             android:icon="@drawable/ic_sign_out"
             android:title="@string/sign_out_menu"/>

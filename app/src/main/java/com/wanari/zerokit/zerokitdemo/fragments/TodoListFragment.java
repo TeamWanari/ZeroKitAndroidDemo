@@ -21,9 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.wanari.zerokit.zerokitdemo.R.id.todoList;
 
@@ -110,5 +108,11 @@ public class TodoListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mainListener = null;
+    }
+
+    public void refresList() {
+        if (mTodoRecyclerViewAdapter != null) {
+            mTodoRecyclerViewAdapter.notifyItemRangeChanged(0, mTodoRecyclerViewAdapter.getItemCount());
+        }
     }
 }

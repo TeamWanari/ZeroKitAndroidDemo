@@ -5,9 +5,7 @@ import com.wanari.zerokit.zerokitdemo.fragments.TodoListFragment;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -39,7 +37,7 @@ public class TodoListFragmentPagerAdapter extends FragmentStatePagerAdapter {
         return tabList.get(position).getTitle();
     }
 
-    public Table getTable(int position){
+    public Table getTable(int position) {
         return tabList.get(position);
     }
 
@@ -49,8 +47,15 @@ public class TodoListFragmentPagerAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
-    public void deleteTable(Table table){
+    public void deleteTable(Table table) {
         this.tabList.remove(table);
         notifyDataSetChanged();
+    }
+
+    public void refreshTable(int position) {
+        Fragment fragment = getItem(position);
+        if (fragment instanceof TodoListFragment) {
+            ((TodoListFragment) fragment).refresList();
+        }
     }
 }

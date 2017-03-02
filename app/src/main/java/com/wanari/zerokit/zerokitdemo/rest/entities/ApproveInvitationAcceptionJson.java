@@ -7,11 +7,7 @@ public class ApproveInvitationAcceptionJson {
     @SerializedName("OperationId")
     private String operationId;
 
-    @SerializedName("AdditionalInfo")
-    private String additionalInfo;
-
-    public ApproveInvitationAcceptionJson(String operationId, String additionalInfo) {
+    public ApproveInvitationAcceptionJson(String operationId) {
         this.operationId = operationId;
-        this.additionalInfo = additionalInfo;
     }
 }

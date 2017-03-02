@@ -2,12 +2,15 @@ package com.wanari.zerokit.zerokitdemo.activities;
 
 import com.tresorit.zerokit.observer.Action1;
 import com.tresorit.zerokit.response.ResponseZerokitError;
+import com.wanari.zerokit.zerokitdemo.R;
 import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import static com.wanari.zerokit.zerokitdemo.R.id.userId;
+import static android.R.attr.data;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -25,7 +28,6 @@ public class SplashActivity extends AppCompatActivity {
                         @Override
                         public void call(String userId) {
                             Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
-                            mainIntent.putExtra(MainActivity.BUNDLE_USERID, userId);
                             startActivity(mainIntent);
                             finish();
                         }
