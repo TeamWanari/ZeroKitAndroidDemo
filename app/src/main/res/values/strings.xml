@@ -36,4 +36,5 @@
     <string name="accept_success">Success</string>
     <string name="invitation_success">Invitation successed</string>
     <string name="refresh_table">Refresh Table</string>
+    <string name="alert_no_table_added">There are no added table</string>
 </resources>

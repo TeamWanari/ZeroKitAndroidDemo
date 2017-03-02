@@ -35,7 +35,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_todo, parent, false);
-        return new ViewHolder(view, mListener);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
 
         public Todo mItem;
 
-        public ViewHolder(View view, IMain listener) {
+        public ViewHolder(View view) {
             super(view);
             mParentView = view;
             mTitleText = (TextView) view.findViewById(R.id.title);
@@ -97,7 +97,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
 
         public void setTodo(Todo todo) {
             this.mItem = todo;
-            if (mItem.getTitle() == null && mItem.getEncryptedTodo() != null) {
+            if (!mItem.isDecrypted() && mItem.getEncryptedTodo() != null) {
                 showProgress();
                 ZerokitManager.getInstance().getZerokit().decrypt(mItem.getEncryptedTodo()).subscribe(new Action1<String>() {
                     @Override
@@ -122,6 +122,8 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
                         mItem.setTitle("Unable to decrypt");
                     }
                 });
+            } else {
+                hideProgress();
             }
         }
 

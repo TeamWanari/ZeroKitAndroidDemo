@@ -21,25 +21,36 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void call(String result) {
                 if ("null".equals(result)) {
-                    startActivity(new Intent(SplashActivity.this, SignInActivity.class));
-                    finish();
+                    startSignIn();
                 } else {
                     ZerokitManager.getInstance().getZerokit().login(result).subscribe(new Action1<String>() {
                         @Override
                         public void call(String userId) {
                             Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+                            if(getIntent() != null){
+                                mainIntent.setData(getIntent().getData());
+                            }
                             startActivity(mainIntent);
                             finish();
                         }
                     }, new Action1<ResponseZerokitError>() {
                         @Override
                         public void call(ResponseZerokitError responseZerokitError) {
-                            startActivity(new Intent(SplashActivity.this, SignInActivity.class));
-                            finish();
+                            startSignIn();
+
                         }
                     });
                 }
             }
         });
+    }
+
+    private void startSignIn() {
+        Intent signInIntent = new Intent(SplashActivity.this, SignInActivity.class);
+        if(getIntent() != null){
+            signInIntent.setData(getIntent().getData());
+        }
+        startActivity(signInIntent);
+        finish();
     }
 }

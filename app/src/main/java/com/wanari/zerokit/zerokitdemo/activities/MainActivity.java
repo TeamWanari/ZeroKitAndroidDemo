@@ -155,20 +155,24 @@ public class MainActivity extends AppCompatActivity implements IMain {
                     @Override
                     public void call(String userId) {
                         final Table tableToRemove = getCurrentTable();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mTodoListFragmentPagerAdapter.deleteTable(tableToRemove);
+                        if (tableToRemove != null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mTodoListFragmentPagerAdapter.deleteTable(tableToRemove);
+                                }
+                            });
+                            if (AppConf.removeTable(userId, tableToRemove) == 0) {
+                                initLayout();
                             }
-                        });
-                        if (AppConf.removeTable(userId, tableToRemove) == 0) {
-                            initLayout();
+                        } else {
+                            showMessage(getString(R.string.alert_no_table_added));
                         }
                     }
                 });
                 return true;
             case R.id.refreshTable:
-                mTodoListFragmentPagerAdapter.refreshTable(mViewPager.getCurrentItem());
+                mTodoListFragmentPagerAdapter.getCurrentFragment().refresList();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -176,13 +180,23 @@ public class MainActivity extends AppCompatActivity implements IMain {
     }
 
     private void showInvitationDialog() {
-        InviteDialogFragment inviteDialogFragment = InviteDialogFragment.newInstance(getCurrentTable().getTresorId());
-        inviteDialogFragment.show(getSupportFragmentManager(), InviteDialogFragment.class.getName());
+        final Table tableToInvite = getCurrentTable();
+        if (tableToInvite != null) {
+            InviteDialogFragment inviteDialogFragment = InviteDialogFragment.newInstance(tableToInvite.getTresorId());
+            inviteDialogFragment.show(getSupportFragmentManager(), InviteDialogFragment.class.getName());
+        } else {
+            showMessage(getString(R.string.alert_no_table_added));
+        }
     }
 
     private void showShareDialog() {
-        ShareDialogFragment shareDialogFragment = ShareDialogFragment.newInstance(getCurrentTable().getTresorId());
-        shareDialogFragment.show(getSupportFragmentManager(), ShareDialogFragment.class.getName());
+        final Table tableToShare = getCurrentTable();
+        if (tableToShare != null) {
+            ShareDialogFragment shareDialogFragment = ShareDialogFragment.newInstance(tableToShare.getTresorId());
+            shareDialogFragment.show(getSupportFragmentManager(), ShareDialogFragment.class.getName());
+        } else {
+            showMessage(getString(R.string.alert_no_table_added));
+        }
     }
 
     private void copyUserIdToClipboard() {
@@ -217,16 +231,27 @@ public class MainActivity extends AppCompatActivity implements IMain {
 
     @Override
     public void todoItemDelete(Todo item) {
-        FireBaseHelper.getInstance().deleteTodo(item, getCurrentTable().getId(), new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+        final Table table = getCurrentTable();
+        if (table != null) {
+            FireBaseHelper.getInstance().deleteTodo(item, table.getId(), new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
 
-            }
-        });
+                }
+            });
+        } else {
+            showMessage(getString(R.string.alert_no_table_added));
+        }
     }
 
-    private Table getCurrentTable() {
-        return mTodoListFragmentPagerAdapter.getTable(mViewPager.getCurrentItem());
+    private
+    @Nullable
+    Table getCurrentTable() {
+        if (mTodoListFragmentPagerAdapter != null) {
+            return mTodoListFragmentPagerAdapter.getTable(mViewPager.getCurrentItem());
+        } else {
+            return null;
+        }
     }
 
     private void openTableList() {

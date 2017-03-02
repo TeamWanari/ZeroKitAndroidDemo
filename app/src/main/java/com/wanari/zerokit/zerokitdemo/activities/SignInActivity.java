@@ -80,6 +80,9 @@ public class SignInActivity extends AppCompatActivity implements ISignIn {
     public void loginSuccess(String userId) {
         hideProgress();
         Intent mainIntent = new Intent(SignInActivity.this, MainActivity.class);
+        if(getIntent() != null){
+            mainIntent.setData(getIntent().getData());
+        }
         startActivity(mainIntent);
         finish();
     }

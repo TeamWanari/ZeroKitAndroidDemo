@@ -156,9 +156,14 @@ public class ShareDialogFragment extends DialogFragment {
     }
 
 
-    private void showMessage(String message) {
-        hideProgress();
-        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+    private void showMessage(final String message) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                hideProgress();
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showProgress() {

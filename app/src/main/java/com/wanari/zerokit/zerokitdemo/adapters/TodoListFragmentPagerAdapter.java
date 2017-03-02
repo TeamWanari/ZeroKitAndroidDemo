@@ -6,12 +6,17 @@ import com.wanari.zerokit.zerokitdemo.fragments.TodoListFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.List;
 
 public class TodoListFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     private List<Table> tabList;
+
+    private TodoListFragment mCurrentFragment;
 
     public TodoListFragmentPagerAdapter(FragmentManager fm, List<Table> tabList) {
         super(fm);
@@ -37,6 +42,12 @@ public class TodoListFragmentPagerAdapter extends FragmentStatePagerAdapter {
         return tabList.get(position).getTitle();
     }
 
+    @Override
+    public int getItemPosition(Object object) {
+        int position = tabList.indexOf(object);
+        return position == -1 ? POSITION_NONE : position;
+    }
+
     public Table getTable(int position) {
         return tabList.get(position);
     }
@@ -52,10 +63,15 @@ public class TodoListFragmentPagerAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
-    public void refreshTable(int position) {
-        Fragment fragment = getItem(position);
-        if (fragment instanceof TodoListFragment) {
-            ((TodoListFragment) fragment).refresList();
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        if (getCurrentFragment() != object) {
+            mCurrentFragment = ((TodoListFragment) object);
         }
+        super.setPrimaryItem(container, position, object);
+    }
+
+    public TodoListFragment getCurrentFragment() {
+        return mCurrentFragment;
     }
 }
