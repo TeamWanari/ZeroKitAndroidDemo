@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.tresorit.zerokit.observer.Action1;
 import com.tresorit.zerokit.response.ResponseZerokitError;
 import com.wanari.zerokit.zerokitdemo.R;
+import com.wanari.zerokit.zerokitdemo.ZerokitApplication;
 import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
 import com.wanari.zerokit.zerokitdemo.entities.Todo;
 import com.wanari.zerokit.zerokitdemo.interfaces.IMain;
@@ -110,7 +111,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
                             mItem.setDescription(decryptedTodo.getDescription());
                             mItem.setDecrypted(true);
                         } catch (Exception e) {
-                            mItem.setTitle("Unable to decrypt");
+                            mItem.setTitle(ZerokitApplication.getInstance().getString(R.string.alert_decrypt_failed));
                         } finally {
                             hideProgress();
                         }
@@ -119,7 +120,7 @@ public class TodoRecyclerViewAdapter extends RecyclerView.Adapter<TodoRecyclerVi
                     @Override
                     public void call(ResponseZerokitError responseZerokitError) {
                         hideProgress();
-                        mItem.setTitle("Unable to decrypt");
+                        mItem.setTitle(ZerokitApplication.getInstance().getString(R.string.alert_decrypt_failed));
                     }
                 });
             } else {

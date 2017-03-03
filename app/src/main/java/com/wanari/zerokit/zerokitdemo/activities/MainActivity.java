@@ -93,7 +93,6 @@ public class MainActivity extends AppCompatActivity implements IMain {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
                         if (addedTables.size() > 0) {
                             if (mTodoListFragmentPagerAdapter == null) {
                                 mTodoListFragmentPagerAdapter = new TodoListFragmentPagerAdapter(getSupportFragmentManager(), addedTables);
@@ -151,25 +150,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
                 showInvitationDialog();
                 return true;
             case R.id.removeTable:
-                ZerokitManager.getInstance().getZerokit().whoAmI().subscribe(new Action1<String>() {
-                    @Override
-                    public void call(String userId) {
-                        final Table tableToRemove = getCurrentTable();
-                        if (tableToRemove != null) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mTodoListFragmentPagerAdapter.deleteTable(tableToRemove);
-                                }
-                            });
-                            if (AppConf.removeTable(userId, tableToRemove) == 0) {
-                                initLayout();
-                            }
-                        } else {
-                            showMessage(getString(R.string.alert_no_table_added));
-                        }
-                    }
-                });
+               removeCurrentTable();
                 return true;
             case R.id.refreshTable:
                 mTodoListFragmentPagerAdapter.getCurrentFragment().refresList();
@@ -177,6 +158,28 @@ public class MainActivity extends AppCompatActivity implements IMain {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void removeCurrentTable(){
+        ZerokitManager.getInstance().getZerokit().whoAmI().subscribe(new Action1<String>() {
+            @Override
+            public void call(String userId) {
+                final Table tableToRemove = getCurrentTable();
+                if (tableToRemove != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTodoListFragmentPagerAdapter.deleteTable(tableToRemove);
+                        }
+                    });
+                    if (AppConf.removeTable(userId, tableToRemove) == 0) {
+                        initLayout();
+                    }
+                } else {
+                    showMessage(getString(R.string.alert_no_table_added));
+                }
+            }
+        });
     }
 
     private void showInvitationDialog() {
