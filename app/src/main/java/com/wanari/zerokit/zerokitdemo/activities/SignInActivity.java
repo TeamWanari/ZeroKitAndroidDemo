@@ -77,7 +77,7 @@ public class SignInActivity extends AppCompatActivity implements ISignIn {
     }
 
     @Override
-    public void loginSuccess(String userId) {
+    public void loginSuccess() {
         hideProgress();
         Intent mainIntent = new Intent(SignInActivity.this, MainActivity.class);
         if(getIntent() != null){

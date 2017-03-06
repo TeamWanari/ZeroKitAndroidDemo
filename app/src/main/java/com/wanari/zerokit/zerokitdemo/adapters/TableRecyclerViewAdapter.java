@@ -1,7 +1,6 @@
 package com.wanari.zerokit.zerokitdemo.adapters;
 
 import com.wanari.zerokit.zerokitdemo.R;
-import com.wanari.zerokit.zerokitdemo.common.AppConf;
 import com.wanari.zerokit.zerokitdemo.entities.Table;
 import com.wanari.zerokit.zerokitdemo.interfaces.ITableList;
 
@@ -66,7 +65,7 @@ public class TableRecyclerViewAdapter extends RecyclerView.Adapter<TableRecycler
         int position = mValues.indexOf(table);
         mValues.remove(table);
         notifyItemRemoved(position);
-        if(mValues.size() == 0){
+        if (mValues.size() == 0) {
             mListener.closeTableList();
         }
     }

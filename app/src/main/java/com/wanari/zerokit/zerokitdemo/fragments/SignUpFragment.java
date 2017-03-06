@@ -181,12 +181,6 @@ public class SignUpFragment extends Fragment implements TextWatcher, View.OnFocu
         }
     }
 
-    private void hideProgress() {
-        if (parentListener != null) {
-            parentListener.hideProgress();
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

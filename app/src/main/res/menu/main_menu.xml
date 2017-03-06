@@ -2,28 +2,31 @@
 <menu
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-            android:id="@+id/search_table"
-            android:icon="@drawable/ic_search"
-            android:title="@string/search_table_menu"
-            app:showAsAction="ifRoom"/>
-    <item
-            android:id="@+id/copyUserId"
-            android:title="@string/copy_userid"/>
-    <item
-            android:id="@+id/share"
-            android:title="@string/share"/>
-    <item
-            android:id="@+id/invite"
-            android:title="@string/create_invitation"/>
-    <item
-            android:id="@+id/removeTable"
-            android:title="@string/remove_table"/>
-    <item
-            android:id="@+id/refreshTable"
-            android:title="@string/refresh_table"/>
-    <item
-            android:id="@+id/sign_out"
-            android:icon="@drawable/ic_sign_out"
-            android:title="@string/sign_out_menu"/>
+    <group
+            android:id="@+id/main_menu_group">
+        <item
+                android:id="@+id/search_table"
+                android:icon="@drawable/ic_search"
+                android:title="@string/search_table_menu"
+                app:showAsAction="ifRoom"/>
+        <item
+                android:id="@+id/copyUserId"
+                android:title="@string/copy_userid"/>
+        <item
+                android:id="@+id/share"
+                android:title="@string/share"/>
+        <item
+                android:id="@+id/invite"
+                android:title="@string/create_invitation"/>
+        <item
+                android:id="@+id/removeTable"
+                android:title="@string/remove_table"/>
+        <item
+                android:id="@+id/refreshTable"
+                android:title="@string/refresh_table"/>
+        <item
+                android:id="@+id/sign_out"
+                android:icon="@drawable/ic_sign_out"
+                android:title="@string/sign_out_menu"/>
+    </group>
 </menu>

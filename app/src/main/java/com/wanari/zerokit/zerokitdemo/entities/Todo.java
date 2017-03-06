@@ -73,14 +73,6 @@ public class Todo implements Parcelable {
         isDecrypted = decrypted;
     }
 
-    @Exclude
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("title", title);
-        result.put("description", description);
-        return result;
-    }
-
     @Override
     public int describeContents() {
         return 0;

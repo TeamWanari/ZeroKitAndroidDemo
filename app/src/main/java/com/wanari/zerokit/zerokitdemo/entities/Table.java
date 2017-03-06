@@ -6,10 +6,7 @@ import com.google.firebase.database.IgnoreExtraProperties;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import static android.R.attr.description;
 
 @IgnoreExtraProperties
 public class Table implements Parcelable {
@@ -46,14 +43,6 @@ public class Table implements Parcelable {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    @Exclude
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("title", title);
-        result.put("tresorId", tresorId);
-        return result;
     }
 
     @Override

@@ -42,16 +42,6 @@ public final class FireBaseHelper {
         databaseRef.child(DATABASE_TODO_LISTS).child(tableId).child(DATABASE_TODOS).addValueEventListener(valueEventListener);
     }
 
-    public void saveTodo(Todo todo, String tableName, OnSuccessListener onSuccessListener) {
-        String key = todo.getId();
-        if (key == null) {
-            key = databaseRef.push().getKey();
-            todo.setId(key);
-        }
-        databaseRef.child(DATABASE_TODO_LISTS).child(tableName).child(DATABASE_TODOS).child(key).setValue(todo)
-                .addOnSuccessListener(onSuccessListener);
-    }
-
     public void saveTodo(@Nullable String key, String encryptedTodo, String tableName, OnSuccessListener onSuccessListener) {
         if (key == null) {
             key = databaseRef.push().getKey();

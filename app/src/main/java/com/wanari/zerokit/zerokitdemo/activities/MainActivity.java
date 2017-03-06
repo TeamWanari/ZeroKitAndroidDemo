@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
 
     private TodoListFragmentPagerAdapter mTodoListFragmentPagerAdapter;
 
-    private MenuItem mSearchMenuItem;
+    private Menu mMainMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
-        mSearchMenuItem = menu.findItem(R.id.search_table);
+        mMainMenu = menu;
         return true;
     }
 
@@ -277,8 +277,8 @@ public class MainActivity extends AppCompatActivity implements IMain {
     }
 
     private void openFragment(Fragment fragment, String tag) {
-        if (mSearchMenuItem != null) {
-            mSearchMenuItem.setVisible(false);
+        if (mMainMenu != null) {
+            mMainMenu.setGroupVisible(R.id.main_menu_group, false);
         }
         mAddTodo.hide();
         mFragmentContainer.setVisibility(View.VISIBLE);
@@ -301,8 +301,8 @@ public class MainActivity extends AppCompatActivity implements IMain {
             } else {
                 mAddTodo.show();
             }
-            if (mSearchMenuItem != null) {
-                mSearchMenuItem.setVisible(true);
+            if (mMainMenu != null) {
+                mMainMenu.setGroupVisible(R.id.main_menu_group, true);
             }
             mFragmentContainer.setVisibility(View.GONE);
             getSupportFragmentManager().beginTransaction().remove(fragment).commit();

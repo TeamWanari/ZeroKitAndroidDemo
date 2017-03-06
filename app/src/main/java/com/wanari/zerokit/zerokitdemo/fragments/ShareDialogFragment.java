@@ -1,6 +1,5 @@
 package com.wanari.zerokit.zerokitdemo.fragments;
 
-import com.tresorit.zerokit.PasswordEditText;
 import com.tresorit.zerokit.observer.Action1;
 import com.tresorit.zerokit.response.ResponseZerokitError;
 import com.wanari.zerokit.zerokitdemo.R;
@@ -35,8 +34,6 @@ public class ShareDialogFragment extends DialogFragment {
     private AutoCompleteTextView userAutoCompleteTextView;
 
     private FrameLayout progressContainer;
-
-    private PasswordEditText.PasswordExporter mPasswordExporter;
 
     private Button cancelBtn;
 
@@ -160,6 +157,7 @@ public class ShareDialogFragment extends DialogFragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                dismiss();
                 hideProgress();
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
             }

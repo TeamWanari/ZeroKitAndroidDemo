@@ -59,8 +59,4 @@ public class APIManager {
     public APIInterface getService() {
         return service;
     }
-
-    public OkHttpClient getOkHttpClient() {
-        return okHttpClient;
-    }
 }

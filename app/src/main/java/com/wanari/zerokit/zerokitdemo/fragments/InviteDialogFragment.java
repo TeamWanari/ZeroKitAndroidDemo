@@ -27,8 +27,6 @@ import okhttp3.ResponseBody;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
-import static android.R.id.message;
-
 public class InviteDialogFragment extends DialogFragment {
 
     private static final String ARG_TERSORID = "tresorId";
@@ -149,7 +147,7 @@ public class InviteDialogFragment extends DialogFragment {
 
     private void creationSuccess() {
         dismiss();
-        Toast.makeText(getContext(), getString(R.string.invitation_success), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), getString(R.string.invitation_success), Toast.LENGTH_LONG).show();
     }
 
     private void showMessage(String message) {

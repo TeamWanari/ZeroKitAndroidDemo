@@ -25,6 +25,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 
@@ -92,6 +94,7 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
 
     private void validateInput() {
         if (ValidationUtils.hasText(usernameContainer) && ValidationUtils.hasText(passwordContainer, mPasswordExporter)) {
+            hideKeyboard();
             showProgress();
             final String alias = usernameEditText.getText().toString();
 
@@ -118,7 +121,7 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
                     @Override
                     public void call(ResponseZerokitLogin responseLogin) {
                         mPasswordExporter.clear();
-                        loginSuccess(userId);
+                        loginSuccess();
                     }
                 }, new Action1<ResponseZerokitError>() {
                     @Override
@@ -128,9 +131,14 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
                 });
     }
 
-    private void loginSuccess(String userId) {
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
+
+    private void loginSuccess() {
         if (parentListener != null) {
-            parentListener.loginSuccess(userId);
+            parentListener.loginSuccess();
         }
     }
 
@@ -143,12 +151,6 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
     private void showProgress() {
         if (parentListener != null) {
             parentListener.showProgress();
-        }
-    }
-
-    private void hideProgress() {
-        if (parentListener != null) {
-            parentListener.hideProgress();
         }
     }
 

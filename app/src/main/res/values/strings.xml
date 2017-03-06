@@ -34,7 +34,7 @@
     <string name="invitation_msg">Invitation message:</string>
     <string name="invite_accept">Invitation</string>
     <string name="accept_success">Success</string>
-    <string name="invitation_success">Invitation successed</string>
+    <string name="invitation_success">Invitation successed, inivitation link is on your clipboard now</string>
     <string name="refresh_table">Refresh Table</string>
     <string name="alert_no_table_added">There are no added table</string>
     <string name="alert_decrypt_failed">Unable to decrypt</string>
