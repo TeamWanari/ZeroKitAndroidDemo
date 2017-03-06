@@ -4,15 +4,19 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import com.wanari.zerokit.zerokitdemo.ZerokitApplication;
+import com.wanari.zerokit.zerokitdemo.entities.LoginData;
 import com.wanari.zerokit.zerokitdemo.entities.Table;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AppConf {
+
+    private static final String KEY_LOGIN_DATA = "LoginData";
 
     private static SharedPreferences sharedPreferences;
 
@@ -21,6 +25,19 @@ public class AppConf {
             sharedPreferences = ZerokitApplication.getInstance().getBaseContext()
                     .getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
         }
+    }
+
+    public static void storeLoginData(LoginData loginData) {
+        init();
+        sharedPreferences.edit().putString(KEY_LOGIN_DATA, new Gson().toJson(loginData)).apply();
+    }
+
+    public static
+    @Nullable
+    LoginData getLoginData() {
+        init();
+        String loginDataString = sharedPreferences.getString(KEY_LOGIN_DATA, "");
+        return new Gson().fromJson(loginDataString, LoginData.class);
     }
 
     public static void putTable(String userId, Table table) {

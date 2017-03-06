@@ -5,7 +5,9 @@ import com.tresorit.zerokit.observer.Action1;
 import com.tresorit.zerokit.response.ResponseZerokitError;
 import com.tresorit.zerokit.response.ResponseZerokitLogin;
 import com.wanari.zerokit.zerokitdemo.R;
+import com.wanari.zerokit.zerokitdemo.common.AppConf;
 import com.wanari.zerokit.zerokitdemo.common.ZerokitManager;
+import com.wanari.zerokit.zerokitdemo.entities.LoginData;
 import com.wanari.zerokit.zerokitdemo.interfaces.ISignIn;
 import com.wanari.zerokit.zerokitdemo.rest.APIManager;
 import com.wanari.zerokit.zerokitdemo.rest.entities.UserJson;
@@ -62,7 +64,15 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
 
         signInBtn = (Button) view.findViewById(R.id.signInBtn);
         setListeners();
+        setData();
         return view;
+    }
+
+    private void setData() {
+        LoginData loginData = AppConf.getLoginData();
+        if (loginData != null) {
+            usernameEditText.setText(loginData.getUsername());
+        }
     }
 
     private void setListeners() {
@@ -83,13 +93,14 @@ public class SignInFragment extends Fragment implements TextWatcher, View.OnFocu
     private void validateInput() {
         if (ValidationUtils.hasText(usernameContainer) && ValidationUtils.hasText(passwordContainer, mPasswordExporter)) {
             showProgress();
-            String alias = usernameEditText.getText().toString();
+            final String alias = usernameEditText.getText().toString();
 
             APIManager.getInstance().getService().getUserIdByUserName(alias).observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io()).subscribe(
                     new rx.functions.Action1<UserJson>() {
                         @Override
                         public void call(UserJson user) {
+                            AppConf.storeLoginData(new LoginData(user.getUserName(), user.getUserId()));
                             login(user.getUserId());
                         }
                     }, new rx.functions.Action1<Throwable>() {

@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
                 showInvitationDialog();
                 return true;
             case R.id.removeTable:
-               removeCurrentTable();
+                removeCurrentTable();
                 return true;
             case R.id.refreshTable:
                 mTodoListFragmentPagerAdapter.getCurrentFragment().refresList();
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements IMain {
         }
     }
 
-    private void removeCurrentTable(){
+    private void removeCurrentTable() {
         ZerokitManager.getInstance().getZerokit().whoAmI().subscribe(new Action1<String>() {
             @Override
             public void call(String userId) {
