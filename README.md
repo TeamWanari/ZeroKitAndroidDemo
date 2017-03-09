@@ -1,7 +1,7 @@
 # ZeroKitAndroidDemo
 
 For more info about ZeroKit and the project, please read our blogpost:
-...coming soon...
+http://leaks.wanari.com/2017/03/09/zerokit-firebase-demo-app-first-look/
 
 To init the app, you have to create two accounts:
   1. ZeroKit account: https://tresorit.com/zerokit you will need your brand new Service URL to set in the Manifest file
@@ -9,7 +9,7 @@ To init the app, you have to create two accounts:
      then setup Firebase realtime database and get the google-services.json config file and paste it into the app folder
      
 You also have to setup a backend to handle API calls and AdminAPI approvals, you can reach at
-...coming soon...
+https://github.com/TeamWanari/ZeroKitBackend
      
 Demo features:
   1.  Registration
